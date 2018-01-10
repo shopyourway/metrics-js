@@ -1,5 +1,5 @@
 {
-  "name": "@ohiobox/metrics",
+  "name": "@shopyourway/metrics",
   "description": "Metrics reporting framework for reporting data point information to aggregators (like Graphite)",
   "license": "MIT",
   "keywords": ["metrics", "graphite", "performance"],
