@@ -13,7 +13,7 @@ Metrics is a reporting framework for data point information (measurements and ti
 
 ## Getting started
 ### Installation
-[![npm (scoped)](https://img.shields.io/npm/v/@shopyourway/metrics.svg)]()
+[![npm (scoped)](https://img.shields.io/npm/v/@shopyourway/metrics.svg)](https://www.npmjs.com/package/@shopyourway/metrics)
 
 ### Configuration
 Import metrics package:
