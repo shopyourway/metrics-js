@@ -1,0 +1,21 @@
+{
+  "name": "@ohiobox/metrics",
+  "description": "Metrics reporting framework for reporting data point information to aggregators (like Graphite)",
+  "license": "MIT",
+  "keywords": ["metrics", "graphite", "performance"],
+  "version": "0.1.0",
+  "repository" :
+  {
+    "type" : "git",
+    "url" : "https://github.com/shopyourway/metrics-js"
+  },
+  "scripts": {
+	"test-ci": "mocha --reporter mocha-teamcity-reporter test",
+	"test": "mocha test"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "sinon": "*",
+    "mocha-teamcity-reporter": "*"
+  }
+}
