@@ -18,7 +18,7 @@ Metrics is a reporting framework for data point information (measurements and ti
 ### Configuration
 Import metrics package:
 ```js
-const Metrics = require('@ohiobox/metrics').Metrics;
+const Metrics = require('@shopyourway/metrics').Metrics;
 ```
 Initialize the metrics instance with the required reporters:
 ```js
@@ -54,7 +54,7 @@ const graphiteHost = '1.1.1.1'; // Graphite server IP address
 const graphitePort = 2003; // Optional - port number. Defaults to 2003
 const spacePrefix = 'My.Project'; // Optional - prefix to all metrics spaces
 
-const graphiteReporter = new require('@ohiobox/metrics').GraphiteReporter({
+const graphiteReporter = new require('@shopyourway/metrics').GraphiteReporter({
 		host: graphiteHost,
 		port: graphitePort,
 		prefix: spacePrefix
@@ -68,7 +68,7 @@ Console reporter comes in handy when you need to debug metrics calls:
 ```js
 const Metrics = require('@shopyourway/metrics').Metrics;
 
-const consoleReporter = new require('@ohiobox/metrics').ConsoleReporter();
+const consoleReporter = new require('@shopyourway/metrics').ConsoleReporter();
 	
 const metrics = new Metrics([consoleReporter], errorHandler);
 ```
@@ -79,7 +79,7 @@ When a metrics will be reported, a message will appear in the terminal, that inc
 const Metrics = require('@shopyourway/metrics').Metrics;
 const fs = require('fs');
 
-const stringReporter = new require('@ohiobox/metrics').StringReporter(metricString => {
+const stringReporter = new require('@shopyourway/metrics').StringReporter(metricString => {
 	fs.appendFile('metrics.log', metricsString);
 });
 	
