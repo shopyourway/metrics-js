@@ -22,10 +22,10 @@ const Metrics = require('@ohiobox/metrics').Metrics;
 ```
 Initialize the metrics instance with the required reporters:
 ```js
-const stringReporter = new require('@ohiobox/metrics').StringReporter(metricString => {
+const stringReporter = new require('@shopyourway/metrics').StringReporter(metricString => {
 	// Do something
 });
-const consoleReporter = new require('@ohiobox/metrics').ConsoleReporter();
+const consoleReporter = new require('@shopyourway/metrics').ConsoleReporter();
 
 const metrics = new Metrics([stringReporter, consoleReporter], errorHandler);
 ```
@@ -48,7 +48,7 @@ Metrics comes with several built-in reporters
 #### Graphite
 Reports metrics to a graphite server:
 ```js
-const metrics = require('@ohiobox/metrics').Metrics;
+const metrics = require('@shopyourway/metrics').Metrics;
 
 const graphiteHost = '1.1.1.1'; // Graphite server IP address
 const graphitePort = 2003; // Optional - port number. Defaults to 2003
@@ -66,7 +66,7 @@ const metrics = new Metrics([graphiteReporter], errorHandler);
 #### Console
 Console reporter comes in handy when you need to debug metrics calls:
 ```js
-const Metrics = require('@ohiobox/metrics').Metrics;
+const Metrics = require('@shopyourway/metrics').Metrics;
 
 const consoleReporter = new require('@ohiobox/metrics').ConsoleReporter();
 	
@@ -76,7 +76,7 @@ When a metrics will be reported, a message will appear in the terminal, that inc
 
 #### String
 ```js
-const Metrics = require('@ohiobox/metrics').Metrics;
+const Metrics = require('@shopyourway/metrics').Metrics;
 const fs = require('fs');
 
 const stringReporter = new require('@ohiobox/metrics').StringReporter(metricString => {
@@ -90,11 +90,11 @@ Here, `StringReporter` is used to build a log file from the metrics reports.
 #### InMemory
 InMemoryReporter can be used for testing purposed, in order to make sure your code reports metrics as expected.
 ```js
-const Metrics = require('@ohiobox/metrics').Metrics;
+const Metrics = require('@shopyourway/metrics').Metrics;
 
 const metricsStorage = [];
 
-const memoryReporter = new require('@ohiobox/metrics').InMemoryReporter(metricsStorage);
+const memoryReporter = new require('@shopyourway/metrics').InMemoryReporter(metricsStorage);
 	
 const metrics = new Metrics([memoryReporter], errorHandler);
 ```
