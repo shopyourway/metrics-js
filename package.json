@@ -3,7 +3,7 @@
   "description": "Metrics reporting framework for reporting data point information to aggregators (like Graphite)",
   "license": "MIT",
   "keywords": ["metrics", "graphite", "performance"],
-  "version": "0.1.1",
+  "version": "0.1.2",
   "repository" :
   {
     "type" : "git",
