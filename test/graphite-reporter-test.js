@@ -100,6 +100,152 @@ describe('GraphiteReporter', function() {
       });
     });
   });
+
+  describe('value', function () {
+    beforeEach(function() {
+      createSocketStub = sinon.stub(dgram, 'createSocket');
+    });
+    afterEach(function() {
+      createSocketStub.restore();
+    });
+
+    it('should send data to Graphite in the form of "key:value|v"', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').value(5);
+
+      var args = socketSendSpy.getCall(0).args;
+      assert.ok(socketSendSpy.calledOnce);
+      var resultParts = splitGraphite(args[0].toString());
+
+      assert.equal(resultParts[0], 'SYW.Adder');
+      assert.equal(resultParts[1], 5);
+      assert.equal(resultParts[2], 'v');
+    });
+
+    it('should use the default Graphite port if no port is provided', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').value(5);
+      var expected = 2003;
+
+      assert.ok(socketSendSpy.calledOnce);
+      var args = socketSendSpy.getCall(0).args;
+      var result = args[3];
+      assert.equal(result, expected);
+    });
+
+    it('should add a valid prefix to the Graphite key when one is provided with a trailing dot', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4', prefix: 'Foo.' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').value(10);
+      var expected = 'Foo.SYW.Adder';
+
+      assert.ok(socketSendSpy.calledOnce);
+      var args = socketSendSpy.getCall(0).args;
+      var data = args[0].toString();
+      var result = splitGraphite(data)[0];
+      assert.equal(result, expected);
+    });
+
+    it('should add a valid prefix to the Graphite key when one is provided without a trailing dot', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4', prefix: 'Foo' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').value(20);
+      var expected = 'Foo.SYW.Adder';
+
+      assert.ok(socketSendSpy.calledOnce);
+      var args = socketSendSpy.getCall(0).args;
+      var data = args[0].toString();
+      var result = splitGraphite(data)[0];
+      assert.equal(result, expected);
+    });
+  });
+
+  describe('increment', function () {
+    beforeEach(function() {
+      createSocketStub = sinon.stub(dgram, 'createSocket');
+    });
+    afterEach(function() {
+      createSocketStub.restore();
+    });
+
+    it('should send data to Graphite in the form of "key:value|c"', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').increment(10);
+
+      var args = socketSendSpy.getCall(0).args;
+      assert.ok(socketSendSpy.calledOnce);
+      var resultParts = splitGraphite(args[0].toString());
+
+      assert.equal(resultParts[0], 'SYW.Adder');
+      assert.equal(resultParts[1], 10);
+      assert.equal(resultParts[2], 'c');
+    });
+
+    it('should use the default Graphite port if no port is provided', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').increment(5);
+      var expected = 2003;
+
+      assert.ok(socketSendSpy.calledOnce);
+      var args = socketSendSpy.getCall(0).args;
+      var result = args[3];
+      assert.equal(result, expected);
+    });
+
+    it('should add a valid prefix to the Graphite key when one is provided with a trailing dot', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4', prefix: 'Foo.' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').increment(10);
+      var expected = 'Foo.SYW.Adder';
+
+      assert.ok(socketSendSpy.calledOnce);
+      var args = socketSendSpy.getCall(0).args;
+      var data = args[0].toString();
+      var result = splitGraphite(data)[0];
+      assert.equal(result, expected);
+    });
+
+    it('should add a valid prefix to the Graphite key when one is provided without a trailing dot', function() {
+      var socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      var graphiteOptions = { host: '1.2.3.4', prefix: 'Foo' };
+      var reporter = new GraphiteReporter(graphiteOptions);
+      var metrics = new Metrics([ reporter ]);
+      metrics.space('SYW.Adder').increment(20);
+      var expected = 'Foo.SYW.Adder';
+
+      assert.ok(socketSendSpy.calledOnce);
+      var args = socketSendSpy.getCall(0).args;
+      var data = args[0].toString();
+      var result = splitGraphite(data)[0];
+      assert.equal(result, expected);
+    });
+  });
 });
 
 function getAsyncFunc(duration) {
