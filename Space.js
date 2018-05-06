@@ -1,4 +1,25 @@
 module.exports = function Space(key, reporters, errback) {
+
+  function forEachReporter(func) {
+    reporters.forEach(function(reporter) {
+      try {
+        func(reporter);
+      }
+      catch (e) {
+        var errMsg = e && e.message ? e.message : 'Error in reporter';
+        (typeof errback === 'function' ? errback : console.log)(errMsg);
+      }
+    });
+  }
+
+  this.value = function (val) {
+      forEachReporter(reporter => reporter.value(key, val));
+  };
+
+  this.increment = function (val = 1) {
+      forEachReporter(reporter => reporter.increment(key, val));
+  };
+
   this.meter = function(func) {
     if(typeof func !== 'function') {
       throw new Error('must pass a function as argument');
@@ -29,15 +50,7 @@ module.exports = function Space(key, reporters, errback) {
 
   function report(key, start, finish) {
     var duration = finish.getTime() - start.getTime();
-    reporters.forEach(function(reporter) {
-      try {
-        reporter.report(key, duration);
-      }
-      catch (e) {
-        var errMsg = e && e.message ? e.message : 'Error in reporter';
-        (typeof errback == 'function' ? errback : console.log)(errMsg);
-      }
-    });
+    forEachReporter(reporter => reporter.report(key, duration));
   }
 };
 
