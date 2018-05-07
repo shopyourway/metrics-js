@@ -210,6 +210,21 @@ describe('Space', function() {
       });
     });
   });
+
+    describe('space', function () {
+      it('should create a report with the concatenated key', function() {
+        var reports = [];
+        var reporter = new InMemoryReporter(reports);
+        var metrics = new Metrics([ reporter ]);
+        var func = getSyncFunc(500);
+        var wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar').meter(func);
+
+        wrappedFunc(1, 1);
+        var report = reports[reports.length-1];
+
+        assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      });
+    });
 });
 
 function getAsyncFunc(duration) {
