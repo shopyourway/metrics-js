@@ -224,6 +224,44 @@ describe('Space', function() {
 
         assert.equal(report.key, 'SYW.Adder.Foo.Bar');
       });
+
+      it('should call the original function with the same arguments that the wrapped function is called with', function() {
+        var reports = [];
+        var reporter = new InMemoryReporter(reports);
+        var metrics = new Metrics([ reporter ]);
+        var func = sinon.spy(getSyncFunc(500));
+        var wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar').meter(func);
+
+        wrappedFunc(1, 1);
+        var result = func.args[0];
+
+        assert.deepEqual(result, [1, 1]);
+      });
+
+      it('should return the result of the original function', function() {
+        var reports = [];
+        var reporter = new InMemoryReporter(reports);
+        var metrics = new Metrics([ reporter ]);
+        var func = getSyncFunc(500);
+        var wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar').meter(func);
+
+        var result = wrappedFunc(1, 1);
+
+        assert.equal(result, 2);
+      });
+
+      it('should call the errback when a reporter throws an error', function() {
+        var reporter = new FailingReporter();
+        var errback = sinon.spy();
+        var metrics = new Metrics([ reporter ], errback);
+        var func = getSyncFunc(500);
+        var wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar').meter(func);
+
+        wrappedFunc(1, 1);
+
+        assert.ok(errback.calledOnce);
+        assert.equal(errback.getCall(0).args[0], 'I just failed, did you expected something else?');
+      });
     });
 });
 
