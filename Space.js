@@ -13,11 +13,11 @@ module.exports = function Space(key, reporters, errback) {
   }
 
   this.value = function (val) {
-      forEachReporter(reporter => reporter.value(key, val));
+    forEachReporter(reporter => reporter.value(key, val));
   };
 
   this.increment = function (val = 1) {
-      forEachReporter(reporter => reporter.increment(key, val));
+    forEachReporter(reporter => reporter.increment(key, val));
   };
 
   this.meter = function(func) {
@@ -46,6 +46,10 @@ module.exports = function Space(key, reporters, errback) {
         return result;
       }
     };
+  };
+
+  this.space = function(nextKey) {
+    return new Space(`${key}.${nextKey}`, reporters, errback);
   };
 
   function report(key, start, finish) {
