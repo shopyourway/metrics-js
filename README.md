@@ -1,7 +1,7 @@
 # Metrics
 Metrics is a reporting framework for data point information (measurements and time series) to aggregators such as [Graphite](https://graphiteapp.org/)
 
-![publish](https://github.com/ysa23/metrics-js/workflows/Node.js%20Publish%20to%20NPM/badge.svg)
+![Node.js Publish to NPM](https://github.com/ysa23/metrics-js/workflows/Node.js%20Publish%20to%20NPM/badge.svg)
 
 ## Highlights
 * Time series reporting
