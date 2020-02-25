@@ -3,19 +3,17 @@
   "description": "Metrics reporting framework for reporting data point information to aggregators (like Graphite)",
   "license": "MIT",
   "keywords": ["metrics", "graphite", "performance"],
-  "version": "0.3.3",
+  "version": "0.4",
   "repository" :
   {
     "type" : "git",
     "url" : "https://github.com/ysa23/metrics-js"
   },
   "scripts": {
-	"test-ci": "mocha --reporter mocha-teamcity-reporter test",
 	"test": "mocha test"
   },
   "devDependencies": {
     "mocha": "*",
     "sinon": "*",
-    "mocha-teamcity-reporter": "*"
   }
 }
