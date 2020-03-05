@@ -1,6 +1,6 @@
 module.exports = {
-    plugins: ['jest'],
-    extends: ['airbnb-base', 'plugin:jest/recommended'],
+    plugins: ['mocha'],
+    extends: ['airbnb-base'],
     rules: {
         'arrow-parens': [2, "as-needed"],
         'no-underscore-dangle': 0,
@@ -16,7 +16,7 @@ module.exports = {
     },
     env: {
         node: true,
-        'jest/globals': true
+        'mocha': true
     },
     globals: {
         fetch: true
