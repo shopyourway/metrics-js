@@ -1,12 +1,11 @@
 module.exports = function Space(key, reporters, errback) {
-
   function forEachReporter(func) {
     reporters.forEach(reporter => {
       try {
         func(reporter);
-      }
-      catch (e) {
+      } catch (e) {
         const errMsg = e && e.message ? e.message : 'Error in reporter';
+        // eslint-disable-next-line no-console
         (typeof errback === 'function' ? errback : console.log)(errMsg);
       }
     });
@@ -25,6 +24,7 @@ module.exports = function Space(key, reporters, errback) {
       throw new Error('must pass a function as argument');
     }
 
+    // eslint-disable-next-line consistent-return
     return (...args) => {
       const start = new Date();
 
@@ -46,13 +46,11 @@ module.exports = function Space(key, reporters, errback) {
     };
   };
 
-  this.space = nextKey => {
-    return new Space(`${key}.${nextKey}`, reporters, errback);
-  };
+  this.space = nextKey => new Space(`${key}.${nextKey}`, reporters, errback);
 
-  function report(key, start, finish) {
+  function report(reportKey, start, finish) {
     const duration = finish.getTime() - start.getTime();
-    forEachReporter(reporter => reporter.report(key, duration));
+    forEachReporter(reporter => reporter.report(reportKey, duration));
   }
 };
 
