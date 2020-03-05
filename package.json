@@ -2,17 +2,25 @@
   "name": "metrics.js",
   "description": "Metrics reporting framework for reporting data point information to aggregators (like Graphite)",
   "license": "MIT",
-  "keywords": ["metrics", "graphite", "performance"],
+  "keywords": [
+    "metrics",
+    "graphite",
+    "performance"
+  ],
   "version": "0.4.1",
-  "repository" :
-  {
-    "type" : "git",
-    "url" : "https://github.com/ysa23/metrics-js"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ysa23/metrics-js"
   },
   "scripts": {
-	"test": "mocha test"
+    "test": "mocha test",
+    "lint": "eslint index.js . || true"
   },
   "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jest": "^23.8.1",
     "mocha": "*",
     "sinon": "*"
   }
