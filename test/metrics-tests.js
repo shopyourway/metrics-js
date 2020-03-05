@@ -1,20 +1,18 @@
-var assert = require('assert');
-var metrics = require('../index');
-var Metrics = metrics.Metrics;
-var InMemoryReporter = metrics.InMemoryReporter;
+const assert = require('assert');
+const { Metrics, InMemoryReporter } = require('../index');
 
-describe('Metrics', function() {
-  describe('constructor', function() {
-    it('should throw an error if called with reporters that are not valid functions', function() {
-      var reports = [];
-      var validReporter = new InMemoryReporter(reports);
-      var invalidReporter = null;
+describe('Metrics', () => {
+  describe('constructor', () => {
+    it('should throw an error if called with reporters that are not valid functions', () => {
+      const reports = [];
+      const validReporter = new InMemoryReporter(reports);
+      const invalidReporter = null;
 
-      var errMsg;
+      let errMsg;
       try {
-        new Metrics([ validReporter, invalidReporter ]);
-      }
-      catch (e) {
+        // eslint-disable-next-line no-new
+        new Metrics([validReporter, invalidReporter]);
+      } catch (e) {
         errMsg = e.message;
       }
 
@@ -22,26 +20,25 @@ describe('Metrics', function() {
     });
   });
 
-  describe('space', function () {
-    it('should throw an error if not called with a non-empty string as argument', function () {
-      var reports = [];
-      var reporter = new InMemoryReporter(reports);
-      var metrics = new Metrics([reporter]);
-      var func = function() {};
+  describe('space', () => {
+    it('should throw an error if not called with a non-empty string as argument', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+      const func = () => {};
       try {
         metrics.space(func);
-      }
-      catch (e) {
-        assert.equal(e.message, 'must pass non-empty key string as argument')
+      } catch (e) {
+        assert.equal(e.message, 'must pass non-empty key string as argument');
       }
     });
 
-    it('should return a `Space` object', function() {
-      var reports = [];
-      var reporter = new InMemoryReporter(reports);
-      var metrics = new Metrics([ reporter ]);
+    it('should return a `Space` object', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
 
-      var result = metrics.space('SYW.Adder');
+      const result = metrics.space('SYW.Adder');
 
       assert.equal(result.constructor.name, 'Space');
     });
