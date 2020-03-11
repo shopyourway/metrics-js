@@ -1,21 +1,19 @@
-var assert = require('assert');
-var sinon = require('sinon');
-var metrics = require('../index');
-var Metrics = metrics.Metrics;
-var StringReporter = metrics.StringReporter;
+const assert = require('assert');
+const sinon = require('sinon');
+const { Metrics, StringReporter } = require('../index');
 
-describe('StringReporter', function() {
-  describe('report', function () {
-    it('should call the underlying function of the StringReporter', function(done) {
-      var logFunc = sinon.spy();
-      var reporter = new StringReporter(logFunc);
-      var metrics = new Metrics([ reporter ]);
-      var func = getAsyncFunc(1000);
-      var wrappedFunc = metrics.space('SYW.Adder').meter(func);
+describe('StringReporter', () => {
+  describe('report', () => {
+    it('should call the underlying function of the StringReporter', done => {
+      const logFunc = sinon.spy();
+      const reporter = new StringReporter(logFunc);
+      const metrics = new Metrics([reporter]);
+      const func = getAsyncFunc(1000);
+      const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
-      wrappedFunc(1, 1, function() {
+      wrappedFunc(1, 1, () => {
         assert.ok(logFunc.calledOnce);
-        var args = logFunc.getCall(0).args;
+        const { args } = logFunc.getCall(0);
         assert.equal(args.length, 1);
         assert.ok(args[0].indexOf('METRICS SYW.Adder : 100') === 0);
         done();
@@ -23,31 +21,31 @@ describe('StringReporter', function() {
     });
   });
 
-  describe('value', function () {
-    it('should call the underlying function of the StringReporter', function() {
-      var logFunc = sinon.spy();
-      var reporter = new StringReporter(logFunc);
-      var metrics = new Metrics([ reporter ]);
+  describe('value', () => {
+    it('should call the underlying function of the StringReporter', () => {
+      const logFunc = sinon.spy();
+      const reporter = new StringReporter(logFunc);
+      const metrics = new Metrics([reporter]);
       metrics.space('SYW.Adder').value(10);
 
       assert.ok(logFunc.calledOnce);
-      var args = logFunc.getCall(0).args;
+      const { args } = logFunc.getCall(0);
       assert.equal(args.length, 1);
       assert.ok(args[0].indexOf('METRICS SYW.Adder : 10') === 0);
     });
   });
 
-  describe('increment', function () {
-    it('should call the underlying function of the StringReporter', function() {
-      var logFunc = sinon.spy();
-      var reporter = new StringReporter(logFunc);
-      var metrics = new Metrics([ reporter ]);
+  describe('increment', () => {
+    it('should call the underlying function of the StringReporter', () => {
+      const logFunc = sinon.spy();
+      const reporter = new StringReporter(logFunc);
+      const metrics = new Metrics([reporter]);
       metrics.space('SYW.Adder').increment(5);
       metrics.space('SYW.Adder').increment(10);
       metrics.space('SYW.Adder').increment(15);
 
       assert.ok(logFunc.calledThrice);
-      var args = logFunc.getCall(2).args;
+      const { args } = logFunc.getCall(2);
       assert.equal(args.length, 1);
       assert.ok(args[0].indexOf('METRICS SYW.Adder : 30') === 0);
     });
@@ -55,9 +53,9 @@ describe('StringReporter', function() {
 });
 
 function getAsyncFunc(duration) {
-  return function(a, b, callback) {
-    setTimeout(function() {
-      var result = a+b;
+  return (a, b, callback) => {
+    setTimeout(() => {
+      const result = a + b;
       callback(null, result);
     }, duration);
   };
