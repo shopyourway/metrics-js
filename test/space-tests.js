@@ -15,12 +15,12 @@ describe('Space', () => {
       }
     });
 
-    context('called on an asynchronous function', () => {
+    context('called on a callback function', () => {
       it('should return a function', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
 
         const result = metrics.space('SYW.Adder').meter(func);
 
@@ -31,7 +31,7 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
@@ -47,7 +47,7 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
@@ -63,7 +63,7 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = sinon.spy(getAsyncFunc(1000));
+        const func = sinon.spy(getCallbackFunc(1000));
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
@@ -79,7 +79,7 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, (err, result) => {
@@ -92,7 +92,7 @@ describe('Space', () => {
       it('should not throw an error when a reporter throws an error', done => {
         const reporter = new FailingReporter();
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, (err, result) => {
@@ -106,7 +106,7 @@ describe('Space', () => {
         const reporter = new FailingReporter();
         const errback = sinon.spy();
         const metrics = new Metrics([reporter], errback);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
@@ -266,7 +266,7 @@ describe('Space', () => {
   });
 });
 
-function getAsyncFunc(duration) {
+function getCallbackFunc(duration) {
   return (a, b, callback) => {
     setTimeout(() => {
       const result = a + b;
