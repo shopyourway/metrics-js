@@ -38,7 +38,7 @@ describe('Space', () => {
         const report = reports[reports.length - 1];
         const result = report.value;
 
-        assert.ok(result >= 1000 && result < 1020, `duration was ${result.toString()}`);
+        assertReport(result);
       });
 
       it('upon promise error, should create a report where the value is the execution time of the original function it receives as argument', async () => {
@@ -60,7 +60,7 @@ describe('Space', () => {
         const report = reports[reports.length - 1];
         const result = report.value;
 
-        assert.ok(result >= 1000 && result < 1020, `duration was ${result.toString()}`);
+        assertReport(result);
       });
     });
 
@@ -89,7 +89,7 @@ describe('Space', () => {
         const report = reports[reports.length - 1];
         const result = report.value;
 
-        assert.ok(result >= 1000 && result < 1020, `duration was ${result.toString()}`);
+        assertReport(result);
       });
 
       it('upon await error, should create a report where the value is the execution time of the original function it receives as argument', async () => {
@@ -112,7 +112,7 @@ describe('Space', () => {
         const report = reports[reports.length - 1];
         const result = report.value;
 
-        assert.ok(result >= 1000 && result < 1020, `duration was ${result.toString()}`);
+        assertReport(result);
       });
     });
 
@@ -139,7 +139,7 @@ describe('Space', () => {
           const report = reports[reports.length - 1];
           const result = report.value;
 
-          assert.ok(result >= 1000 && result < 1020, `duration was ${result.toString()}`);
+          assertReport(result);
           done();
         });
       });
@@ -241,7 +241,7 @@ describe('Space', () => {
         const report = reports[reports.length - 1];
         const result = report.value;
 
-        assert.ok(result >= 500 && result < 505);
+        assert.ok(result >= 490 && result < 510);
       });
 
       it('should create a report where the key is the argument passed to the Space constructor', () => {
@@ -366,6 +366,10 @@ describe('Space', () => {
     });
   });
 });
+
+function assertReport(reportedTime) {
+  assert.ok(reportedTime >= 900 && reportedTime < 1100, `duration was ${reportedTime}`);
+}
 
 function getPromiseError(delay) {
   return new Promise((resolve, reject) => {
