@@ -374,6 +374,7 @@ function assertReport(reportedTime) {
 function getPromiseError(delay) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
+      // eslint-disable-next-line no-console
       console.log('timeout completed');
       reject(new Error('ERROR'));
     }, delay);
