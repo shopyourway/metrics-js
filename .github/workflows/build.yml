@@ -1,6 +1,9 @@
-name: Node.js Publish to NPM
+name: Lint and tests (branches)
 
-on: push
+on:
+  push:
+    branches:
+      - '!master'   # excludes master
 
 jobs:
   build:
