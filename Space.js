@@ -20,15 +20,36 @@ module.exports = function Space(key, reporters, errback) {
   };
 
   this.meter = func => {
-    if (typeof func !== 'function') {
+    if (typeof func !== 'function' && !isPromise(func)) {
       throw new Error('must pass a function as argument');
+    }
+
+    if (isPromise(func)) {
+      const start = new Date();
+      return func
+        .finally(() => {
+          const finish = new Date();
+          report(key, start, finish);
+        });
+    }
+
+    if (isAsyncFunc(func)) {
+      return async () => {
+        const start = new Date();
+        try {
+          await func();
+        } finally {
+          const finish = new Date();
+          report(key, start, finish);
+        }
+      };
     }
 
     // eslint-disable-next-line consistent-return
     return (...args) => {
       const start = new Date();
 
-      if (isAsyncFunc(args)) {
+      if (isCallbackFunc(args)) {
         const callback = args.pop();
         args.push((...callbackArgs) => {
           const finish = new Date();
@@ -54,6 +75,14 @@ module.exports = function Space(key, reporters, errback) {
   }
 };
 
-function isAsyncFunc(args) {
+function isCallbackFunc(args) {
   return typeof args[args.length - 1] === 'function';
+}
+
+function isPromise(func) {
+  return func instanceof Promise;
+}
+
+function isAsyncFunc(func) {
+  return func.constructor.name === 'AsyncFunction';
 }

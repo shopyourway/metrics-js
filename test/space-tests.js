@@ -15,12 +15,113 @@ describe('Space', () => {
       }
     });
 
-    context('called on an asynchronous function', () => {
+    context('called on a promise', () => {
+      it('should return a Promise', () => {
+        const reports = [];
+        const reporter = new InMemoryReporter(reports);
+        const metrics = new Metrics([reporter]);
+        const func = getPromise(1000);
+
+        const result = metrics.space('SYW.Adder').meter(func);
+
+        assert.equal(result instanceof Promise, true);
+      });
+
+      it('upon promise resolve, should create a report where the value is the execution time of the original function it receives as argument', async () => {
+        const reports = [];
+        const reporter = new InMemoryReporter(reports);
+        const metrics = new Metrics([reporter]);
+        const func = getPromise(1000);
+
+        await metrics.space('SYW.Adder').meter(func);
+
+        const report = reports[reports.length - 1];
+        const result = report.value;
+
+        assertReport(result);
+      });
+
+      it('upon promise error, should create a report where the value is the execution time of the original function it receives as argument', async () => {
+        const reports = [];
+        const reporter = new InMemoryReporter(reports);
+        const metrics = new Metrics([reporter]);
+        const func = getPromiseError(1000);
+
+        let errorThrown = false;
+        try {
+          await metrics.space('SYW.Adder').meter(func);
+        } catch (err) {
+          errorThrown = true;
+        }
+
+        assert.equal(errorThrown, true, 'Error was swallowed. It needs to be thrown');
+        assert.equal(reports.length, 1);
+
+        const report = reports[reports.length - 1];
+        const result = report.value;
+
+        assertReport(result);
+      });
+    });
+
+    context('called on a async function', () => {
+      it('should return a async function', () => {
+        const reports = [];
+        const reporter = new InMemoryReporter(reports);
+        const metrics = new Metrics([reporter]);
+        const func = getAsyncFunction(1000);
+
+        const result = metrics.space('SYW.Adder').meter(func);
+
+        assert.equal(typeof result, 'function');
+        assert.equal(result.constructor.name, 'AsyncFunction');
+      });
+
+      it('upon await successful execution, should create a report where the value is the execution time of the original function it receives as argument', async () => {
+        const reports = [];
+        const reporter = new InMemoryReporter(reports);
+        const metrics = new Metrics([reporter]);
+        const func = getAsyncFunction(1000);
+
+        const wrapper = metrics.space('SYW.Adder').meter(func);
+        await wrapper();
+
+        const report = reports[reports.length - 1];
+        const result = report.value;
+
+        assertReport(result);
+      });
+
+      it('upon await error, should create a report where the value is the execution time of the original function it receives as argument', async () => {
+        const reports = [];
+        const reporter = new InMemoryReporter(reports);
+        const metrics = new Metrics([reporter]);
+        const func = getAsyncErrorFunction(1000);
+
+        let errorThrown = false;
+        try {
+          const wrapper = metrics.space('SYW.Adder').meter(func);
+          await wrapper();
+        } catch (err) {
+          errorThrown = true;
+        }
+
+        assert.equal(errorThrown, true, 'Error was swallowed. It needs to be thrown');
+        assert.equal(reports.length, 1);
+
+        const report = reports[reports.length - 1];
+        const result = report.value;
+
+        assertReport(result);
+      });
+    });
+
+    context('called on a callback function', () => {
       it('should return a function', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
 
         const result = metrics.space('SYW.Adder').meter(func);
 
@@ -31,14 +132,14 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
           const report = reports[reports.length - 1];
           const result = report.value;
 
-          assert.ok(result >= 1000 && result < 1020, `duration was ${result.toString()}`);
+          assertReport(result);
           done();
         });
       });
@@ -47,7 +148,7 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
@@ -63,7 +164,7 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = sinon.spy(getAsyncFunc(1000));
+        const func = sinon.spy(getCallbackFunc(1000));
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
@@ -79,7 +180,7 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, (err, result) => {
@@ -92,7 +193,7 @@ describe('Space', () => {
       it('should not throw an error when a reporter throws an error', done => {
         const reporter = new FailingReporter();
         const metrics = new Metrics([reporter]);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, (err, result) => {
@@ -106,7 +207,7 @@ describe('Space', () => {
         const reporter = new FailingReporter();
         const errback = sinon.spy();
         const metrics = new Metrics([reporter], errback);
-        const func = getAsyncFunc(1000);
+        const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, () => {
@@ -140,7 +241,7 @@ describe('Space', () => {
         const report = reports[reports.length - 1];
         const result = report.value;
 
-        assert.ok(result >= 500 && result < 505);
+        assert.ok(result >= 490 && result < 510);
       });
 
       it('should create a report where the key is the argument passed to the Space constructor', () => {
@@ -266,7 +367,39 @@ describe('Space', () => {
   });
 });
 
-function getAsyncFunc(duration) {
+function assertReport(reportedTime) {
+  assert.ok(reportedTime >= 900 && reportedTime < 1100, `duration was ${reportedTime}`);
+}
+
+function getPromiseError(delay) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      // eslint-disable-next-line no-console
+      console.log('timeout completed');
+      reject(new Error('ERROR'));
+    }, delay);
+  });
+}
+
+function getPromise(delay) {
+  return new Promise(resolve => {
+    setTimeout(resolve, delay);
+  });
+}
+
+function getAsyncFunction(delay) {
+  return async () => {
+    await getPromise(delay);
+  };
+}
+
+function getAsyncErrorFunction(delay) {
+  return async () => {
+    await getPromiseError(delay);
+  };
+}
+
+function getCallbackFunc(duration) {
   return (a, b, callback) => {
     setTimeout(() => {
       const result = a + b;
