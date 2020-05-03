@@ -5,7 +5,7 @@ Metrics is a reporting framework for data point information (measurements and ti
 
 ## Highlights
 * Time series reporting
-* Support pluggable reporters
+* Support plugable reporters
 * Built in reporters:
 	* Graphite
 	* String
@@ -15,19 +15,19 @@ Metrics is a reporting framework for data point information (measurements and ti
 
 ## Getting started
 ### Installation
-[![npm (scoped)](https://img.shields.io/npm/v/@shopyourway/metrics.svg)](https://www.npmjs.com/package/@shopyourway/metrics)
+[![npm (scoped)](https://img.shields.io/npm/v/metrics-reporter.svg)](https://www.npmjs.com/package/metrics-reporter)
 
 ### Configuration
 Import metrics package:
 ```js
-const Metrics = require('@shopyourway/metrics').Metrics;
+const Metrics = require('metrics-reporter').Metrics;
 ```
 Initialize the metrics instance with the required reporters:
 ```js
-const stringReporter = new require('@shopyourway/metrics').StringReporter(metricString => {
+const stringReporter = new require('metrics-reporter').StringReporter(metricString => {
 	// Do something
 });
-const consoleReporter = new require('@shopyourway/metrics').ConsoleReporter();
+const consoleReporter = new require('metrics-reporter').ConsoleReporter();
 
 const metrics = new Metrics([stringReporter, consoleReporter], errorHandler);
 ```
@@ -50,13 +50,13 @@ Metrics comes with several built-in reporters
 #### Graphite
 Reports metrics to a graphite server:
 ```js
-const metrics = require('@shopyourway/metrics').Metrics;
+const metrics = require('metrics-reporter').Metrics;
 
 const graphiteHost = '1.1.1.1'; // Graphite server IP address
 const graphitePort = 2003; // Optional - port number. Defaults to 2003
 const spacePrefix = 'My.Project'; // Optional - prefix to all metrics spaces
 
-const graphiteReporter = new require('@shopyourway/metrics').GraphiteReporter({
+const graphiteReporter = new require('metrics-reporter').GraphiteReporter({
 		host: graphiteHost,
 		port: graphitePort,
 		prefix: spacePrefix
@@ -68,9 +68,9 @@ const metrics = new Metrics([graphiteReporter], errorHandler);
 #### Console
 Console reporter comes in handy when you need to debug metrics calls:
 ```js
-const Metrics = require('@shopyourway/metrics').Metrics;
+const Metrics = require('metrics-reporter').Metrics;
 
-const consoleReporter = new require('@shopyourway/metrics').ConsoleReporter();
+const consoleReporter = new require('metrics-reporter').ConsoleReporter();
 	
 const metrics = new Metrics([consoleReporter], errorHandler);
 ```
@@ -78,10 +78,10 @@ When a metrics will be reported, a message will appear in the terminal, that inc
 
 #### String
 ```js
-const Metrics = require('@shopyourway/metrics').Metrics;
+const Metrics = require('metrics-reporter').Metrics;
 const fs = require('fs');
 
-const stringReporter = new require('@shopyourway/metrics').StringReporter(metricString => {
+const stringReporter = new require('metrics-reporter').StringReporter(metricString => {
 	fs.appendFile('metrics.log', metricsString);
 });
 	
@@ -92,11 +92,11 @@ Here, `StringReporter` is used to build a log file from the metrics reports.
 #### InMemory
 InMemoryReporter can be used for testing purposed, in order to make sure your code reports metrics as expected.
 ```js
-const Metrics = require('@shopyourway/metrics').Metrics;
+const Metrics = require('metrics-reporter').Metrics;
 
 const metricsStorage = [];
 
-const memoryReporter = new require('@shopyourway/metrics').InMemoryReporter(metricsStorage);
+const memoryReporter = new require('metrics-reporter').InMemoryReporter(metricsStorage);
 	
 const metrics = new Metrics([memoryReporter], errorHandler);
 ```
@@ -118,15 +118,14 @@ module.exports = function RedisReporter(channel) {
   }
 };
 ```
-The new reporter will pusblish a message to a specified channel in redis when a metric is reported.
+The new reporter will publish a message to a specified channel in redis when a metric is reported.
 
 ## Development
 
 ### How to contribute
-We encorage contribution via pull requests on any feature you see fit.
+We encourage contribution via pull requests on any feature you see fit.
 
 When submitting a pull request make sure to do the following:
-* Check that new and updated code follows OhioBox existing code formatting and naming standard
 * Run all unit and integration tests to ensure no existing functionality has been affected
 * Write unit or integration tests to test your changes. All features and fixed bugs must have tests to verify they work
 Read [GitHub Help](https://help.github.com/articles/about-pull-requests/) for more details about creating pull requests
