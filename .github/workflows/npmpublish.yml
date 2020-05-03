@@ -1,9 +1,8 @@
 name: Node.js Publish to NPM
 
 on:
-  push:
-    branches:
-    - master
+  release:
+    types: [created]
 
 jobs:
   build:
