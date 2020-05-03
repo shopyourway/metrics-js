@@ -1,9 +1,6 @@
 name: Lint and tests (branches)
 
-on:
-  push:
-    branches:
-      - '!master'   # excludes master
+on: push
 
 jobs:
   build:
