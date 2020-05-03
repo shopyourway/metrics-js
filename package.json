@@ -1,5 +1,5 @@
 {
-  "name": "metrics.js",
+  "name": "metrics-js",
   "description": "Metrics reporting framework for reporting data point information to aggregators (like Graphite)",
   "license": "MIT",
   "keywords": [
