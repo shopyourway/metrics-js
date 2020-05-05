@@ -19,6 +19,22 @@ describe('StringReporter', () => {
         done();
       });
     });
+
+    it('when tags are specified, tags should be included in the report', done => {
+      const logFunc = sinon.spy();
+      const reporter = new StringReporter(logFunc);
+      const metrics = new Metrics([reporter]);
+      const func = getAsyncFunc(1000);
+      const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        assert.ok(logFunc.calledOnce);
+        const { args } = logFunc.getCall(0);
+        assert.equal(args.length, 1);
+        assert.ok(args[0].indexOf('METRICS SYW.Adder : 100') === 0);
+        done();
+      });
+    });
   });
 
   describe('value', () => {

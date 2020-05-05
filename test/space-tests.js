@@ -324,6 +324,25 @@ describe('Space', () => {
       assert.equal(report.key, 'SYW.Adder.Foo.Bar');
     });
 
+    it('when space has tags, should create a report with all the tags from all spaces', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+      const func = getSyncFunc(500);
+
+      const wrappedFunc = metrics.space('SYW', { source: 'test' }).space('Adder').space('Foo', { cause: 'error' }).space('Bar')
+        .meter(func);
+
+      wrappedFunc(1, 1);
+      const report = reports[reports.length - 1];
+
+      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      assert.deepEqual(report.tags, {
+        source: 'test',
+        cause: 'error',
+      });
+    });
+
     it('should call the original function with the same arguments that the wrapped function is called with', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
@@ -363,6 +382,90 @@ describe('Space', () => {
 
       assert.ok(errback.calledOnce);
       assert.equal(errback.getCall(0).args[0], 'I just failed, did you expected something else?');
+    });
+  });
+
+  describe('increment', () => {
+    it('when value is not specify, increment by one', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+        .increment();
+
+      assert.equal(reports.length, 1);
+      let report = reports[0];
+
+      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      assert.equal(report.value, 1);
+
+      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+        .increment();
+
+      assert.equal(reports.length, 2);
+      // eslint-disable-next-line prefer-destructuring
+      report = reports[1];
+
+      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      assert.equal(report.value, 2);
+    });
+
+    it('when value is specified, increment by given value', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+        .increment(3);
+
+      assert.equal(reports.length, 1);
+      const report = reports[0];
+
+      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      assert.equal(report.value, 3);
+    });
+
+    it('when tags are specified, key should have tags', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+      metrics.space('SYW', { source: 'test' }).space('Adder').space('Foo', { cause: 'error' }).space('Bar')
+        .increment();
+
+      assert.equal(reports.length, 1);
+      const report = reports[0];
+
+      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      assert.deepEqual(report.tags, { source: 'test', cause: 'error' });
+    });
+  });
+
+  describe('value', () => {
+    it('should set value', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+        .value(2);
+
+      assert.equal(reports.length, 1);
+      const report = reports[0];
+
+      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      assert.equal(report.value, 2);
+    });
+
+    it('when tags are specified, should set value', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+      metrics.space('SYW', { source: 'test' }).space('Adder').space('Foo', { cause: 'error' }).space('Bar')
+        .value(2);
+
+      assert.equal(reports.length, 1);
+      const report = reports[0];
+
+      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      assert.deepEqual(report.tags, { source: 'test', cause: 'error' });
     });
   });
 });
