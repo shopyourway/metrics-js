@@ -21,7 +21,7 @@ Metrics is a reporting framework for data point information (measurements and ti
 ### Configuration
 Import metrics package:
 ```js
-const Metrics = require('metrics-reporter').Metrics;
+const { Metrics } = require('metrics-reporter');
 ```
 Initialize the metrics instance with the required reporters:
 ```js
@@ -49,15 +49,15 @@ Note that the metrics is reported only **after** the callback is called.
 ### Reporters
 Metrics comes with several built-in reporters
 #### Graphite
-Reports metrics to a graphite server:
+Reports metrics to a graphite server (via statsd):
 ```js
-const metrics = require('metrics-reporter').Metrics;
+const { Metrics, GraphiteReporter } = require('metrics-reporter');
 
 const graphiteHost = '1.1.1.1'; // Graphite server IP address
-const graphitePort = 2003; // Optional - port number. Defaults to 2003
+const graphitePort = 8125; // Optional - port number. Defaults to 8125
 const spacePrefix = 'My.Project'; // Optional - prefix to all metrics spaces
 
-const graphiteReporter = new require('metrics-reporter').GraphiteReporter({
+const graphiteReporter = new GraphiteReporter({
 		host: graphiteHost,
 		port: graphitePort,
 		prefix: spacePrefix
