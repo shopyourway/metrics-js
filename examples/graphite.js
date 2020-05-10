@@ -12,4 +12,4 @@ const graphiteReporter = new GraphiteReporter({
 
 const metrics = new Metrics([graphiteReporter]);
 
-metrics.space('final.frontier').value(123);
+metrics.space('example.metrics.graphite').value(123);
