@@ -1,20 +1,36 @@
-const map = new Map();
-
 module.exports = function StringReporter(func) {
-  this.report = (key, value) => {
-    func(`METRICS ${key} : ${value}`);
+  const map = new Map();
+
+  this.report = (key, value, tags) => {
+    func(format(key, value, tags));
   };
 
-  this.value = (key, value) => {
-    func(`METRICS ${key} : ${value}`);
+  this.value = (key, value, tags) => {
+    func(format(key, value, tags));
   };
 
-  this.increment = (key, value = 1) => {
-    let oldValue = map.get(key) || 0;
+  this.increment = (key, value = 1, tags) => {
+    const k = getKey(key, tags);
+
+    let oldValue = map.get(k) || 0;
 
     oldValue += value;
 
-    map.set(key, oldValue);
-    func(`METRICS ${key} : ${oldValue}`);
+    map.set(k, oldValue);
+    func(format(key, oldValue, tags));
   };
+
+  function getKey(key, tags) {
+    return `${key}${formatTags(tags)}`;
+  }
+
+  function format(key, value, tags) {
+    return `METRICS ${getKey(key, tags)} : ${value}`;
+  }
+
+  function formatTags(tags) {
+    if (!tags) return '';
+
+    return `{${Object.entries(tags).map(x => `${x[0]}:${x[1]}`).join(',')}}`;
+  }
 };

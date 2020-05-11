@@ -5,11 +5,11 @@ module.exports = function Metrics(reporters, errback) {
     throw new Error('must pass valid reporters with a `report` function');
   }
 
-  this.space = key => {
+  this.space = (key, tags) => {
     if (typeof key !== 'string' || key.length < 1) {
       throw new Error('must pass non-empty key string as argument');
     }
 
-    return new Space(key, reporters, errback);
+    return new Space(key, tags, reporters, errback);
   };
 };

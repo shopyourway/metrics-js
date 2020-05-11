@@ -1,4 +1,4 @@
-module.exports = function Space(key, reporters, errback) {
+module.exports = function Space(key, tags, reporters, errback) {
   function forEachReporter(func) {
     reporters.forEach(reporter => {
       try {
@@ -12,11 +12,11 @@ module.exports = function Space(key, reporters, errback) {
   }
 
   this.value = val => {
-    forEachReporter(reporter => reporter.value(key, val));
+    forEachReporter(reporter => reporter.value(key, val, tags));
   };
 
   this.increment = (val = 1) => {
-    forEachReporter(reporter => reporter.increment(key, val));
+    forEachReporter(reporter => reporter.increment(key, val, tags));
   };
 
   this.meter = func => {
@@ -67,11 +67,15 @@ module.exports = function Space(key, reporters, errback) {
     };
   };
 
-  this.space = nextKey => new Space(`${key}.${nextKey}`, reporters, errback);
+  this.space = (nextKey, nextTags) => {
+    const newKey = `${key}.${nextKey}`;
+    const newTags = { ...tags, ...nextTags };
+    return new Space(newKey, newTags, reporters, errback);
+  };
 
   function report(reportKey, start, finish) {
     const duration = finish.getTime() - start.getTime();
-    forEachReporter(reporter => reporter.report(reportKey, duration));
+    forEachReporter(reporter => reporter.report(reportKey, duration, tags));
   }
 };
 

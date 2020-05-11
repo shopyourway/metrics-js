@@ -48,7 +48,7 @@ describe('GraphiteReporter', () => {
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
-      const expected = 2003;
+      const expected = 8125;
 
       const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
@@ -135,7 +135,7 @@ describe('GraphiteReporter', () => {
       const graphiteOptions = { host: '1.2.3.4' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
-      const expected = 2003;
+      const expected = 8125;
 
       metrics.space('SYW.Adder').value(5);
 
@@ -211,7 +211,7 @@ describe('GraphiteReporter', () => {
       const graphiteOptions = { host: '1.2.3.4' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
-      const expected = 2003;
+      const expected = 8125;
 
       metrics.space('SYW.Adder').increment(5);
 
