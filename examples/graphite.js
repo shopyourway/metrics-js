@@ -1,4 +1,4 @@
-const { Metrics, GraphiteReporter } = require('../');
+const { Metrics, GraphiteReporter } = require('..');
 
 const graphiteHost = '127.0.0.1'; // Graphite server IP address
 const graphitePort = 8125; // Optional - port number. Defaults to 8125
