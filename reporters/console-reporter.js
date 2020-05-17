@@ -1,4 +1,4 @@
-const StringReporter = require('./StringReporter');
+const StringReporter = require('./string-reporter');
 
 module.exports = function ConsoleReporter() {
   // eslint-disable-next-line no-console

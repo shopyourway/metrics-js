@@ -1,4 +1,4 @@
-const Space = require('./Space');
+const Space = require('./space');
 
 module.exports = function Metrics(reporters, errback) {
   if (!reporters.every(r => r && typeof r.report === 'function')) {

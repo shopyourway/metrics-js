@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { Metrics, InMemoryReporter } = require('../index');
+const { Metrics, InMemoryReporter } = require('./index');
 
 describe('Metrics', () => {
   describe('constructor', () => {
