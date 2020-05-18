@@ -36,7 +36,7 @@ describe('DataDogReporter', () => {
         const result = splitStat(args[0].toString());
 
         assert.equal(result[0], 'metric.test.datadog');
-        assert.ok(result[1] >= 1000 && result[1] < 1020);
+        assert.ok(result[1] >= 900 && result[1] < 1500);
         assert.equal(result[2], 'ms');
         done();
       });
