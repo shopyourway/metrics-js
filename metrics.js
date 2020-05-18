@@ -6,10 +6,6 @@ module.exports = function Metrics(reporters, errback) {
   }
 
   this.space = (key, tags) => {
-    if (typeof key !== 'string' || key.length < 1) {
-      throw new Error('must pass non-empty key string as argument');
-    }
-
     return new Space(key, tags, reporters, errback);
   };
 };

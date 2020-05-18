@@ -26,11 +26,36 @@ describe('Metrics', () => {
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
       const func = () => {};
-      try {
+
+      assert.throws(() => {
         metrics.space(func);
-      } catch (e) {
-        assert.equal(e.message, 'must pass non-empty key string as argument');
-      }
+      }, {
+        message: 'must pass non-empty key string as argument',
+      });
+    });
+
+    it('when tags is a string, should throw error', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+
+      assert.throws(() => {
+        metrics.space('metric.test', 'tag');
+      }, {
+        message: 'tags must be an object',
+      });
+    });
+
+    it('when tags is an array, should throw error', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter(reports);
+      const metrics = new Metrics([reporter]);
+
+      assert.throws(() => {
+        metrics.space('metric.test', ['tag']);
+      }, {
+        message: 'tags must be an object',
+      });
     });
 
     it('should return a `Space` object', () => {
@@ -38,7 +63,7 @@ describe('Metrics', () => {
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
 
-      const result = metrics.space('SYW.Adder');
+      const result = metrics.space('metric.test');
 
       assert.equal(result.constructor.name, 'Space');
     });
