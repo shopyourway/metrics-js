@@ -1,0 +1,10 @@
+version: '3'
+services:
+  datadog-agent:
+    image: datadog/agent:latest
+    restart: always
+    environment:
+      DD_API_KEY: PUT_DATADOG_API_KEY_HERE
+      DD_DOGSTATSD_NON_LOCAL_TRAFFIC: 'true'
+    ports:
+      - '8125:8125/udp' # statsd
