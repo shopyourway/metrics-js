@@ -8,30 +8,30 @@ module.exports = function GraphiteReporter(opts) {
   const prefix = typeof opts.prefix === 'string' && opts.prefix.length ? removeRedundantDots(`${opts.prefix}.`) : '';
 
   this.report = (key, value, tags) => {
-    warnOnTags('REPORT', key, tags);
+    validateTags('REPORT', key, tags);
 
     const plaintext = `${prefix}${key}:${value}|ms`;
     send(plaintext);
   };
 
   this.value = (key, value, tags) => {
-    warnOnTags('VALUE', key, tags);
+    validateTags('VALUE', key, tags);
 
     const plaintext = `${prefix}${key}:${value}|v`;
     send(plaintext);
   };
 
   this.increment = (key, value = 1, tags) => {
-    warnOnTags('INCREMENT', key, tags);
+    validateTags('INCREMENT', key, tags);
 
     const plaintext = `${prefix}${key}:${value}|c`;
     send(plaintext);
   };
 
-  function warnOnTags(op, key, tags) {
+  function validateTags(op, key, tags) {
     if (tags) {
       // eslint-disable-next-line no-console
-      console.warn(`${op}: Tags are not supported in graphite reporter at this time. "${key}" tags will be emitted`);
+      throw new Error(`${op}: Tags are not supported in graphite reporter at this time. "${key}" tags will be emitted`);
     }
   }
 

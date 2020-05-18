@@ -41,6 +41,25 @@ describe('GraphiteReporter', () => {
       });
     }));
 
+    it('when tags are used, should report error to callback and do not report metric', () => new Promise(done => {
+      const socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      stubDateNow(1464260419000);
+      const graphiteOptions = { host: '1.2.3.4' };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      let error;
+      const metrics = new Metrics([reporter], e => { error = e; });
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test', { tag1: 'value1' }).meter(func);
+
+      wrappedFunc(1, 1, () => {
+        assert.ok(socketSendSpy.notCalled);
+        assert.ok(error instanceof Error);
+        done();
+      });
+    }));
+
     it('should use the default Graphite port if no port is provided', () => new Promise(done => {
       const socketSendSpy = sinon.spy();
       stubCreateSocket(socketSendSpy);
@@ -129,6 +148,20 @@ describe('GraphiteReporter', () => {
       assert.equal(resultParts[2], 'v');
     });
 
+    it('when tags are specified, should call the error callback and do not send metric', () => {
+      const socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      const graphiteOptions = { host: '1.2.3.4' };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      let error;
+      const metrics = new Metrics([reporter], e => { error = e; });
+
+      metrics.space('metric.test', { tag1: 'value1' }).value(5);
+
+      assert.ok(socketSendSpy.notCalled);
+      assert.ok(error instanceof Error);
+    });
+
     it('should use the default Graphite port if no port is provided', () => {
       const socketSendSpy = sinon.spy();
       stubCreateSocket(socketSendSpy);
@@ -203,6 +236,20 @@ describe('GraphiteReporter', () => {
       assert.equal(resultParts[0], 'SYW.Adder');
       assert.equal(resultParts[1], 10);
       assert.equal(resultParts[2], 'c');
+    });
+
+    it('when tags are specified, should send error to error callback and do not report metric', () => {
+      const socketSendSpy = sinon.spy();
+      stubCreateSocket(socketSendSpy);
+      const graphiteOptions = { host: '1.2.3.4' };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      let error;
+      const metrics = new Metrics([reporter], e => { error = e; });
+
+      metrics.space('metric.test', { tag1: 'value1' }).increment(10);
+
+      assert.ok(socketSendSpy.notCalled);
+      assert.ok(error instanceof Error);
     });
 
     it('should use the default Graphite port if no port is provided', () => {

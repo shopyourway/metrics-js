@@ -12,9 +12,8 @@ module.exports = function Space(key, tags, reporters, errback) {
       try {
         func(reporter);
       } catch (e) {
-        const errMsg = e && e.message ? e.message : 'Error in reporter';
         // eslint-disable-next-line no-console
-        (typeof errback === 'function' ? errback : console.log)(errMsg);
+        (typeof errback === 'function' ? errback : console.log)(e);
       }
     });
   }
