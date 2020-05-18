@@ -96,9 +96,18 @@ metrics
     .increment(); 
     // will increment 'http.requests' with 'verb:GET,path:users' tags
 ```
-
 ##### Note
 When the same tag is specified when creating nested spaces, the last value will be reported
+
+#### Error handling
+Metrics support error handling. When creating a Metric object you can send an error callback:
+```js
+const metrics = new Metrics([new ConsoleReporter()], e => {
+    // e is a javascript Error object. You can log it on any standard logging framework:
+    logger.error(e);
+});
+```
+The error callback receives a single parameter - an Error instance. The callback will be triggered when any error occurs during the metrics reporting
 
 ### Reporters
 Metrics comes with several built-in reporters
