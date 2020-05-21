@@ -126,8 +126,27 @@ const graphiteReporter = new GraphiteReporter({
 		prefix: spacePrefix
 	});
 
-const metrics = new Metrics([graphiteReporter], errorHandler);
+const metrics = new Metrics([graphiteReporter], errorCallback);
 ```
+
+#### DataDog
+Reports metrics to a [DataDog](https://www.datadoghq.com/) (via [DogStatsD](https://docs.datadoghq.com/developers/dogstatsd/?tab=hostagent)):
+```js
+const { Metrics, DataDogReporter } = require('metrics-reporter');
+
+const agentHost = '1.1.1.1'; // DataDog agent IP address
+const port = 8125; // Optional - port number. Defaults to 8125
+const spacePrefix = 'My.Project'; // Optional - prefix to all metrics spaces
+
+const datadogReporter = new DataDogReporter({
+		host: agentHost,
+		port: port,
+		prefix: spacePrefix
+	});
+
+const metrics = new Metrics([datadogReporter], errorCallback);
+```
+Note that you'll need a running [DataDog agent](https://docs.datadoghq.com/agent/). In the `/docker` folder there's a simple docker compose for datadog to get you started
 
 #### Console
 Console reporter comes in handy when you need to debug metrics calls:
@@ -168,7 +187,7 @@ When a metric is reported, an object with `key`, `value` and `tags` properties i
 Then, the array can be used in order to validate the report.
 
 ### Building new reporters
-Metrics support creating new reports acccording to an application needs.
+Metrics support creating new reports according to an application needs.
 
 A reporter must contain three methods:
 * `report` - for reporting time

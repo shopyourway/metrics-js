@@ -1,5 +1,5 @@
 module.exports = function Space(key, tags, reporters, errback) {
-  if (typeof key !== 'string' || key.length < 1) {
+  if (typeof key !== 'string' || key.length === 0) {
     throw new Error('must pass non-empty key string as argument');
   }
 
