@@ -19,7 +19,7 @@ Metrics is a time series reporting framework for to aggregators and metrics coll
 * [Getting Started](#getting-started)
     * [Installations](#installation)
     * [Configuration](#configuration)
-    * [Reporting](#reporting)
+    * [Reporting metrics](#reporting-metrics)
         * [Execution time](#execution-time)
         * [Value](#value)
         * [Increment](#increment)
@@ -56,7 +56,7 @@ const consoleReporter = new ConsoleReporter();
 const metrics = new Metrics([stringReporter, consoleReporter], errorCallback);
 ```
 
-### Reporting
+### Reporting Metrics
 Use the `space` method on the `Metrics` instance to report custom metrics. `space` creates a new key to report:
 ```js
 const metric = metrics.space('http');
