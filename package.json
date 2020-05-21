@@ -13,9 +13,10 @@
     "url": "https://github.com/ysa23/metrics-js"
   },
   "scripts": {
-    "test": "mocha test",
+    "test": "mocha --recursive *.test.js **/*.test.js",
     "lint": "eslint index.js .",
-    "example:graphite" : "node ./examples/graphite.js"
+    "example:graphite" : "node ./examples/graphite.js",
+    "example:datadog": "node ./examples/datadog.js"
   },
   "devDependencies": {
     "eslint": "^6.8.0",

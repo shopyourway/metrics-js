@@ -1,6 +1,6 @@
 const assert = require('assert');
 const sinon = require('sinon');
-const { Metrics, InMemoryReporter } = require('../index');
+const { Metrics, InMemoryReporter } = require('./index');
 
 describe('Space', () => {
   describe('meter', () => {

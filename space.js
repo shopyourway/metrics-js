@@ -1,4 +1,12 @@
 module.exports = function Space(key, tags, reporters, errback) {
+  if (typeof key !== 'string' || key.length === 0) {
+    throw new Error('must pass non-empty key string as argument');
+  }
+
+  if (tags && (Array.isArray(tags) || typeof tags !== 'object')) {
+    throw new Error('tags must be an object');
+  }
+
   function forEachReporter(func) {
     reporters.forEach(reporter => {
       try {
