@@ -7,13 +7,15 @@ module.exports = function Space(key, tags, reporters, errback) {
     throw new Error('tags must be an object');
   }
 
+  // eslint-disable-next-line no-console
+  const errorCallback = typeof errback === 'function' ? errback :console.log;
+
   function forEachReporter(func) {
     reporters.forEach(reporter => {
       try {
         func(reporter);
       } catch (e) {
-        // eslint-disable-next-line no-console
-        (typeof errback === 'function' ? errback : console.log)(e);
+        errorCallback(e);
       }
     });
   }
