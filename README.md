@@ -7,12 +7,33 @@ Metrics is a time series reporting framework for to aggregators and metrics coll
 ## Highlights
 * Time series reporting
 * Plugin based: Support different aggregators with plugable reporters
-* Built in reporters:
-	* Graphite
-	* String
-	* Console
-	* InMemory (for testing)
+* Built in [reporters](#Reporters):
+	* [Graphite (statsd)](#Graphite)
+	* [DataDog](#DataDog)
+	* [String](#String)
+	* [Console](#Console)
+	* [InMemory (for testing)](#InMemory)
 * Simple, easy to use API
+
+## Table of Contents
+* [Getting Started](#getting-started)
+    * [Installations](#installation)
+    * [Configuration](#configuration)
+    * [Reporting metrics](#reporting-metrics)
+        * [Execution time](#execution-time)
+        * [Value](#value)
+        * [Increment](#increment)
+        * [Tagging support](#tagging-support)
+     * [Reporters](#reporters)
+        * [Graphite](#Graphite)
+        * [DataDog](#DataDog)
+        * [String](#String)
+        * [Console](#Console)
+        * [InMemory](#InMemory)
+    * [Building new reporters](#building-new-reporters)
+* [Development](#development)
+    * [How to contribute](#how-to-contribute)
+    * [Running tests](#running-tests)
 
 ## Getting started
 ### Installation
@@ -35,7 +56,7 @@ const consoleReporter = new ConsoleReporter();
 const metrics = new Metrics([stringReporter, consoleReporter], errorCallback);
 ```
 
-### Reporting
+### Reporting Metrics
 Use the `space` method on the `Metrics` instance to report custom metrics. `space` creates a new key to report:
 ```js
 const metric = metrics.space('http');
