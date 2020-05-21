@@ -15,6 +15,26 @@ Metrics is a time series reporting framework for to aggregators and metrics coll
 	* [InMemory (for testing)](#InMemory)
 * Simple, easy to use API
 
+## Table of Contents
+* [Getting Started](#getting-started)
+    * [Installations](#installation)
+    * [Configuration](#configuration)
+    * [Reporting](#reporting)
+        * [Execution time](#execution-time)
+        * [Value](#value)
+        * [Increment](#increment)
+        * [Tagging support](#tagging-support)
+     * [Reporters](#reporters)
+        * [Graphite](#Graphite)
+        * [DataDog](#DataDog)
+        * [String](#String)
+        * [Console](#Console)
+        * [InMemory](#InMemory)
+    * [Building new reporters](#building-new-reporters)
+* [Development](#development)
+    * [How to contribute](#how-to-contribute)
+    * [Running tests](#running-tests)
+
 ## Getting started
 ### Installation
 [![npm (scoped)](https://img.shields.io/npm/v/metrics-reporter.svg)](https://www.npmjs.com/package/metrics-reporter)

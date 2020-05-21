@@ -5,7 +5,9 @@
   "keywords": [
     "metrics",
     "graphite",
-    "performance"
+    "performance",
+    "datadog",
+    "DogStatsD"
   ],
   "version": "0.6.0",
   "repository": {
