@@ -7,11 +7,12 @@ Metrics is a time series reporting framework for to aggregators and metrics coll
 ## Highlights
 * Time series reporting
 * Plugin based: Support different aggregators with plugable reporters
-* Built in reporters:
-	* Graphite
-	* String
-	* Console
-	* InMemory (for testing)
+* Built in [reporters](#Reporters):
+	* [Graphite (statsd)](#Graphite)
+	* [DataDog](#DataDog)
+	* [String](#String)
+	* [Console](#Console)
+	* [InMemory (for testing)](#InMemory)
 * Simple, easy to use API
 
 ## Getting started
