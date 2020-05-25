@@ -5,9 +5,11 @@
   "keywords": [
     "metrics",
     "graphite",
-    "performance"
+    "performance",
+    "datadog",
+    "DogStatsD"
   ],
-  "version": "0.5.1",
+  "version": "0.6.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/ysa23/metrics-js"
@@ -15,7 +17,7 @@
   "scripts": {
     "test": "mocha --recursive *.test.js **/*.test.js",
     "lint": "eslint index.js .",
-    "example:graphite" : "node ./examples/graphite.js",
+    "example:graphite": "node ./examples/graphite.js",
     "example:datadog": "node ./examples/datadog.js"
   },
   "devDependencies": {
