@@ -8,7 +8,7 @@ module.exports = function Space(key, tags, reporters, errback) {
   }
 
   // eslint-disable-next-line no-console
-  const errorCallback = typeof errback === 'function' ? errback :console.log;
+  const errorCallback = typeof errback === 'function' ? errback : console.log;
 
   function forEachReporter(func) {
     reporters.forEach(reporter => {
