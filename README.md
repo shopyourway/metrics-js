@@ -219,27 +219,28 @@ The methods get the following parameters:
  * `key` (mandatory) - the metric to report
  * `value` (mandatory) - the value to report (ms, count or increment for example)
  * `tags` (optional) - an object that contains the tags to report on the metric as properties 
+ * `errorCallback` (optional) - a callback function to be triggered when an error occurs within the reporter.
 
 For example, lets see how to implement a reporter for redis:
 ```js
 const client = require('redis').createClient();
 
 module.exports = function RedisReporter(channel) {
-  this.report = function(key, value, tags) { 
-    client.publish(channel, JSON.stringify({ key: key, value: value }));
+  this.report = function(key, value, tags, errorCallback) { 
+    client.publish(channel, JSON.stringify({ key, value, tags  }));
   }
 
-  this.value = function(key, value, tags) {
-    client.set(key, value);
+  this.value = function(key, value, tags, errorCallback) {
+    client.set(key, value, errorCallback);
   }
  
-  this.increment = function(key, value, tags) {
+  this.increment = function(key, value, tags, errorCallback) {
     const multi = client.multi();
     for(let i = 0; i < value; i++) {
         multi.incr(key);
     }   
         
-    multi.exec();
+    multi.exec(errorCallback);
   }
 };
 ```
