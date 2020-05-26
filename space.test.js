@@ -212,7 +212,7 @@ describe('Space', () => {
 
         wrappedFunc(1, 1, () => {
           assert.ok(errback.calledOnce);
-          assert.equal(errback.getCall(0).args[0], 'I just failed, did you expected something else?');
+          assert.equal(errback.getCall(0).args[0].message, 'I just failed, did you expected something else?');
           done();
         });
       });
@@ -304,7 +304,7 @@ describe('Space', () => {
         wrappedFunc(1, 1);
 
         assert.ok(errback.calledOnce);
-        assert.equal(errback.getCall(0).args[0], 'I just failed, did you expected something else?');
+        assert.equal(errback.getCall(0).args[0].message, 'I just failed, did you expected something else?');
       });
     });
   });
@@ -381,7 +381,7 @@ describe('Space', () => {
       wrappedFunc(1, 1);
 
       assert.ok(errback.calledOnce);
-      assert.equal(errback.getCall(0).args[0], 'I just failed, did you expected something else?');
+      assert.equal(errback.getCall(0).args[0].message, 'I just failed, did you expected something else?');
     });
   });
 
@@ -523,6 +523,16 @@ function getSyncFunc(duration) {
 function FailingReporter() {
   // eslint-disable-next-line no-unused-vars
   this.report = (key, value) => {
+    throw new Error('I just failed, did you expected something else?');
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  this.increment = (key, value) => {
+    throw new Error('I just failed, did you expected something else?');
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  this.value = (key, value) => {
     throw new Error('I just failed, did you expected something else?');
   };
 }

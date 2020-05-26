@@ -7,24 +7,25 @@ module.exports = function Space(key, tags, reporters, errback) {
     throw new Error('tags must be an object');
   }
 
+  // eslint-disable-next-line no-console
+  const errorCallback = typeof errback === 'function' ? errback : console.log;
+
   function forEachReporter(func) {
     reporters.forEach(reporter => {
       try {
         func(reporter);
       } catch (e) {
-        const errMsg = e && e.message ? e.message : 'Error in reporter';
-        // eslint-disable-next-line no-console
-        (typeof errback === 'function' ? errback : console.log)(errMsg);
+        errorCallback(e);
       }
     });
   }
 
   this.value = val => {
-    forEachReporter(reporter => reporter.value(key, val, tags));
+    forEachReporter(reporter => reporter.value(key, val, tags, errorCallback));
   };
 
   this.increment = (val = 1) => {
-    forEachReporter(reporter => reporter.increment(key, val, tags));
+    forEachReporter(reporter => reporter.increment(key, val, tags, errorCallback));
   };
 
   this.meter = func => {
@@ -83,7 +84,7 @@ module.exports = function Space(key, tags, reporters, errback) {
 
   function report(reportKey, start, finish) {
     const duration = finish.getTime() - start.getTime();
-    forEachReporter(reporter => reporter.report(reportKey, duration, tags));
+    forEachReporter(reporter => reporter.report(reportKey, duration, tags, errorCallback));
   }
 };
 
