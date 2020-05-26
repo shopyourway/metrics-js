@@ -18,6 +18,57 @@ describe('Metrics', () => {
 
       assert.equal(errMsg, 'must pass valid reporters with a `report` function');
     });
+
+    it('should throw an error if called with reporters that does not have report function', () => {
+      const reports = [];
+      const validReporter = new InMemoryReporter(reports);
+      const invalidReporter = new InMemoryReporter([]);
+      invalidReporter.report = undefined;
+
+      let errMsg;
+      try {
+        // eslint-disable-next-line no-new
+        new Metrics([validReporter, invalidReporter]);
+      } catch (e) {
+        errMsg = e.message;
+      }
+
+      assert.equal(errMsg, 'must pass valid reporters with a `report` function');
+    });
+
+    it('should throw an error if called with reporters that does not have value function', () => {
+      const reports = [];
+      const validReporter = new InMemoryReporter(reports);
+      const invalidReporter = new InMemoryReporter([]);
+      invalidReporter.value = undefined;
+
+      let errMsg;
+      try {
+        // eslint-disable-next-line no-new
+        new Metrics([validReporter, invalidReporter]);
+      } catch (e) {
+        errMsg = e.message;
+      }
+
+      assert.equal(errMsg, 'must pass valid reporters with a `report` function');
+    });
+
+    it('should throw an error if called with reporters that does not have increment function', () => {
+      const reports = [];
+      const validReporter = new InMemoryReporter(reports);
+      const invalidReporter = new InMemoryReporter([]);
+      invalidReporter.increment = undefined;
+
+      let errMsg;
+      try {
+        // eslint-disable-next-line no-new
+        new Metrics([validReporter, invalidReporter]);
+      } catch (e) {
+        errMsg = e.message;
+      }
+
+      assert.equal(errMsg, 'must pass valid reporters with a `report` function');
+    });
   });
 
   describe('space', () => {
