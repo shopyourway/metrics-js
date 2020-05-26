@@ -35,7 +35,7 @@ describe('GraphiteReporter', () => {
         const resultParts = splitGraphite(args[0].toString());
 
         assert.equal(resultParts[0], 'SYW.Adder');
-        assert.ok(resultParts[1] >= 1000 && resultParts[1] < 1020);
+        assert.ok(resultParts[1] >= 900 && resultParts[1] < 1100);
         assert.equal(resultParts[2], 'ms');
         done();
       });
