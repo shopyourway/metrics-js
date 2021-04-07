@@ -2,10 +2,12 @@ const dgram = require('dgram');
 
 const redundantDotsRegex = new RegExp('\\.\\.+', 'g');
 
-module.exports = function DataDogReporter(opts) {
-  const { host, defaultTags } = opts;
-  const port = opts.port || 8125;
-  const prefix = typeof opts.prefix === 'string' && opts.prefix.length ? removeRedundantDots(`${opts.prefix}.`) : '';
+module.exports = function DataDogReporter({
+  host,
+  defaultTags,
+  port = 8125,
+  prefix }) {
+  const metricsPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
 
   this.report = (key, value, tags, errorCallback) => {
     send(key, value, 'ms', tags, errorCallback);
@@ -20,7 +22,7 @@ module.exports = function DataDogReporter(opts) {
   };
 
   function send(key, value, type, tags, errorCallback) {
-    const stat = `${prefix}${key}:${value}|${type}${stringifyTags(tags)}`;
+    const stat = `${metricsPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
 
     const socket = dgram.createSocket('udp4');
     const buff = Buffer.from(stat);
