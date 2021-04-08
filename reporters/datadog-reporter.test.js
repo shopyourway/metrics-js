@@ -19,8 +19,7 @@ describe('DataDogReporter', () => {
     });
 
     it('should send data to DataDog in the form of "key:value|ms"', () => new Promise(done => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       stubDateNow(1464260419000);
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
@@ -30,8 +29,8 @@ describe('DataDogReporter', () => {
       const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
 
       wrappedFunc(1, 1, () => {
-        assert.ok(socketSendSpy.calledOnce);
-        const { args } = socketSendSpy.getCall(0);
+        assert.ok(send.calledOnce);
+        const { args } = send.getCall(0);
 
         const result = splitStat(args[0].toString());
 
@@ -43,8 +42,7 @@ describe('DataDogReporter', () => {
     }));
 
     it('should use the default DataDog port if no port is provided', () => new Promise(done => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { connect } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -54,17 +52,16 @@ describe('DataDogReporter', () => {
       const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
 
       wrappedFunc(1, 1, () => {
-        assert.ok(socketSendSpy.calledOnce);
-        const { args } = socketSendSpy.getCall(0);
-        const result = args[3];
+        assert.ok(connect.calledOnce);
+        const { args } = connect.getCall(0);
+        const result = args[0];
         assert.equal(result, expected);
         done();
       });
     }));
 
     it('should add a valid prefix to the key when one is provided with a trailing dot', () => new Promise(done => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix.' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -74,8 +71,8 @@ describe('DataDogReporter', () => {
       const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
 
       wrappedFunc(1, 1, () => {
-        assert.ok(socketSendSpy.calledOnce);
-        const { args } = socketSendSpy.getCall(0);
+        assert.ok(send.calledOnce);
+        const { args } = send.getCall(0);
         const result = splitStat(args[0].toString())[0];
         assert.equal(result, expected);
         done();
@@ -83,8 +80,7 @@ describe('DataDogReporter', () => {
     }));
 
     it('should add a valid prefix to the key when one is provided without a trailing dot', () => new Promise(done => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -94,8 +90,8 @@ describe('DataDogReporter', () => {
       const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
 
       wrappedFunc(1, 1, () => {
-        assert.ok(socketSendSpy.calledOnce);
-        const { args } = socketSendSpy.getCall(0);
+        assert.ok(send.calledOnce);
+        const { args } = send.getCall(0);
         const result = splitStat(args[0].toString())[0];
         assert.equal(result, expected);
         done();
@@ -103,8 +99,7 @@ describe('DataDogReporter', () => {
     }));
 
     it('when tags are specified, should send data to DataDog in the form of "key:value|ms|#tag:value"', () => new Promise(done => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       stubDateNow(1464260419000);
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
@@ -114,8 +109,8 @@ describe('DataDogReporter', () => {
       const wrappedFunc = metrics.space('metric.test.datadog', { tag1: 'value1', tag2: 'value2' }).meter(func);
 
       wrappedFunc(1, 1, () => {
-        assert.ok(socketSendSpy.calledOnce);
-        const { args } = socketSendSpy.getCall(0);
+        assert.ok(send.calledOnce);
+        const { args } = send.getCall(0);
 
         const result = splitStat(args[0].toString());
 
@@ -137,23 +132,21 @@ describe('DataDogReporter', () => {
     });
 
     it('should send data to DataDog in the form of "key:value|g"', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 
       metrics.space('metric.test.value').value(5);
 
-      const { args } = socketSendSpy.getCall(0);
-      assert.ok(socketSendSpy.calledOnce);
+      const { args } = send.getCall(0);
+      assert.ok(send.calledOnce);
       const result = args[0].toString();
       assert.equal(result, 'metric.test.value:5|g');
     });
 
     it('should use the default DataDog port if no port is provided', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { connect } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -161,15 +154,14 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.value').value(5);
 
-      assert.ok(socketSendSpy.calledOnce);
-      const { args } = socketSendSpy.getCall(0);
-      const result = args[3];
+      assert.ok(connect.calledOnce);
+      const { args } = connect.getCall(0);
+      const result = args[0];
       assert.equal(result, expected);
     });
 
     it('should add a valid prefix to the key when one is provided with a trailing dot', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix.' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -177,15 +169,14 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.value').value(10);
 
-      assert.ok(socketSendSpy.calledOnce);
-      const { args } = socketSendSpy.getCall(0);
+      assert.ok(send.calledOnce);
+      const { args } = send.getCall(0);
       const result = args[0].toString();
       assert.equal(result, expected);
     });
 
     it('should add a valid prefix to the key when one is provided without a trailing dot', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -193,23 +184,22 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.value').value(20);
 
-      assert.ok(socketSendSpy.calledOnce);
-      const { args } = socketSendSpy.getCall(0);
+      assert.ok(send.calledOnce);
+      const { args } = send.getCall(0);
       const result = args[0].toString();
       assert.equal(result, expected);
     });
 
     it('when tags are specified, should send data to DataDog in the form of "key:value|g|#tag:value"', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 
       metrics.space('metric.test.value', { tag1: 'value1', tag2: 'value2' }).value(5);
 
-      const { args } = socketSendSpy.getCall(0);
-      assert.ok(socketSendSpy.calledOnce);
+      const { args } = send.getCall(0);
+      assert.ok(send.calledOnce);
       const result = args[0].toString();
       assert.equal(result, 'metric.test.value:5|g|#tag1:value1,tag2:value2');
     });
@@ -224,23 +214,21 @@ describe('DataDogReporter', () => {
     });
 
     it('should send data to DataDog in the form of "key:value|c"', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 
       metrics.space('metric.test.inc').increment(10);
 
-      const { args } = socketSendSpy.getCall(0);
-      assert.ok(socketSendSpy.calledOnce);
+      const { args } = send.getCall(0);
+      assert.ok(send.calledOnce);
       const result = args[0].toString();
       assert.equal(result, 'metric.test.inc:10|c');
     });
 
     it('should use the default DataDog port if no port is provided', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { connect } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -248,15 +236,14 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.inc').increment(5);
 
-      assert.ok(socketSendSpy.calledOnce);
-      const { args } = socketSendSpy.getCall(0);
-      const result = args[3];
+      assert.ok(connect.calledOnce);
+      const { args } = connect.getCall(0);
+      const result = args[0];
       assert.equal(result, expected);
     });
 
     it('should add a valid prefix to the key when one is provided with a trailing dot', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix.' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -264,15 +251,14 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.inc').increment(10);
 
-      assert.ok(socketSendSpy.calledOnce);
-      const { args } = socketSendSpy.getCall(0);
+      assert.ok(send.calledOnce);
+      const { args } = send.getCall(0);
       const result = args[0].toString();
       assert.equal(result, expected);
     });
 
     it('should add a valid prefix to the key when one is provided without a trailing dot', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -280,23 +266,22 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.inc').increment(20);
 
-      assert.ok(socketSendSpy.calledOnce);
-      const { args } = socketSendSpy.getCall(0);
+      assert.ok(send.calledOnce);
+      const { args } = send.getCall(0);
       const result = args[0].toString();
       assert.equal(result, expected);
     });
 
     it('when tags are specified, should send data to DataDog in the form of "key:value|c|#tag:value"', () => {
-      const socketSendSpy = sinon.spy();
-      stubCreateSocket(socketSendSpy);
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 
       metrics.space('metric.test.inc', { tag1: 'value1', tag2: 'value2' }).increment(10);
 
-      const { args } = socketSendSpy.getCall(0);
-      assert.ok(socketSendSpy.calledOnce);
+      const { args } = send.getCall(0);
+      assert.ok(send.calledOnce);
       const result = args[0].toString();
       assert.equal(result, 'metric.test.inc:10|c|#tag1:value1,tag2:value2');
     });
@@ -312,11 +297,15 @@ function getAsyncFunc(duration) {
   };
 }
 
-function stubCreateSocket(sendFunc) {
+function stubCreateSocket() {
   const socketStub = {
-    send: sendFunc,
+    send: sinon.spy(),
+    connect: sinon.spy(),
+    unref: sinon.spy(),
   };
   createSocketStub.withArgs('udp4').returns(socketStub);
+
+  return socketStub;
 }
 
 function stubDateNow(timestamp) {
