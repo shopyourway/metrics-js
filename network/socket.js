@@ -1,7 +1,7 @@
 const dgram = require('dgram');
 
 module.exports = function Socket({
-  port, host, buffer = true, maxBufferSize = 1000,
+  port, host, batch = true, maxBufferSize = 1000,
 }) {
   if (!port) {
     throw new TypeError('port is mandatory');
@@ -13,6 +13,9 @@ module.exports = function Socket({
   const socket = dgram.createSocket('udp4');
   socket.unref();
 
+  let buffer = [];
+  let bufferSize = 0;
+
   this.send = ({ message, callback }) => {
     if (!message) {
       throw new TypeError('message is mandatory');
@@ -21,6 +24,29 @@ module.exports = function Socket({
       throw new TypeError('callback should be a function');
     }
 
+    if (batch === true) {
+      append({ message, callback });
+    } else {
+      sendImmediate({ message, callback });
+    }
+  };
+
+  function append({ message, callback }) {
+    buffer.push(message);
+    bufferSize += message.length;
+
+    if (bufferSize > maxBufferSize) {
+      const bufferedMessage = buffer.join('\n');
+      // We capture the messages to send first to avoid concurrency issues for handling the buffer.
+      // If we purge it after, new messages added to the buffer won't be sent, or worse, resent.
+      bufferSize = 0;
+      buffer = [];
+
+      sendImmediate({ message: bufferedMessage });
+    }
+  }
+
+  function sendImmediate({ message, callback }) {
     const bytes = Buffer.from(message);
     socket.send(bytes, 0, bytes.length, port, host, err => {
       if (!callback) {
@@ -34,5 +60,5 @@ module.exports = function Socket({
 
       callback();
     });
-  };
+  }
 };

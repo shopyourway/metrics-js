@@ -72,6 +72,7 @@ describe('socket', () => {
       const target = new Socket({
         port: 1234,
         host: '127.0.0.1',
+        batch: false,
       });
 
       target.send({ message: 'a message from beyond' });
@@ -92,6 +93,7 @@ describe('socket', () => {
       const target = new Socket({
         port: 1234,
         host: '127.0.0.1',
+        batch: false,
       });
 
       const callback = sinon.spy();
@@ -109,6 +111,7 @@ describe('socket', () => {
       const target = new Socket({
         port: 1234,
         host: '127.0.0.1',
+        batch: false,
       });
 
       const callback = sinon.spy();
@@ -126,6 +129,7 @@ describe('socket', () => {
       const target = new Socket({
         port: 1234,
         host: '127.0.0.1',
+        batch: false,
       });
 
       target.send({ message: 'a message from beyond' });
@@ -142,6 +146,77 @@ describe('socket', () => {
       });
 
       assert.throws(() => target.send({ message: 'a message from beyond', callback: 'not a function' }), TypeError);
+    });
+
+    describe('buffer', () => {
+      it('should not send message if buffer size is less then max size', () => {
+        const { send } = stubCreateSocket();
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 100,
+        });
+
+        target.send({ message: 'a message from beyond' });
+
+        assert.strictEqual(send.calledOnce, false);
+      });
+
+      it('should send message when buffer is filled', () => {
+        const { send } = stubCreateSocket();
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+        });
+
+        target.send({ message: 'a message from beyond' });
+        target.send({ message: 'another message from beyond' });
+
+        assert.strictEqual(send.calledOnce, true);
+        assert.strictEqual(send.getCall(0).args[0].toString(), 'a message from beyond\nanother message from beyond');
+      });
+
+      it('should not additional message until buffer is filled again', () => {
+        const { send } = stubCreateSocket();
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+        });
+
+        target.send({ message: 'a message from beyond' });
+        target.send({ message: 'another message from beyond' });
+        target.send({ message: 'a third message' });
+
+        assert.strictEqual(send.calledOnce, true);
+        assert.strictEqual(send.getCall(0).args[0].toString(), 'a message from beyond\nanother message from beyond');
+      });
+
+      it('should send additional message only when buffer was already sent', () => {
+        const { send } = stubCreateSocket();
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+        });
+
+        target.send({ message: 'a message from beyond' });
+        target.send({ message: 'another message from beyond' });
+        target.send({ message: 'a third message' });
+        target.send({ message: 'a forth message, too many messages, so little time' });
+
+        assert.strictEqual(send.calledTwice, true);
+        assert.strictEqual(send.getCall(1).args[0].toString(), 'a third message\na forth message, too many messages, so little time');
+      });
     });
   });
 

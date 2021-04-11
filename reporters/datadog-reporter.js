@@ -7,12 +7,12 @@ module.exports = function DataDogReporter({
   defaultTags,
   port = 8125,
   prefix,
-  buffer = false,
+  batch = false,
   maxBufferSize,
 }) {
   const metricsPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
   const socket = new Socket({
-    port, host, buffer, maxBufferSize,
+    port, host, batch, maxBufferSize,
   });
 
   this.report = (key, value, tags, errorCallback) => {
