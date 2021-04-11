@@ -1,7 +1,7 @@
 const dgram = require('dgram');
 
 module.exports = function Socket({
-  port, host, batch = true,
+  port, host, buffer = true, maxBufferSize = 1000,
 }) {
   const socket = dgram.createSocket('udp4');
   socket.unref();
