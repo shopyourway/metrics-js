@@ -286,7 +286,8 @@ describe('socket', () => {
       it('should not send on interval when buffer is empty', async () => {
         const { send } = stubCreateSocket();
 
-        const target = new Socket({
+        // eslint-disable-next-line no-new
+        new Socket({
           port: 1234,
           host: '127.0.0.1',
           buffer: true,
@@ -304,7 +305,7 @@ describe('socket', () => {
   });
 
   describe('close', () => {
-    it('should flush buffer when batch is true and there are items in the buffer',  () => {
+    it('should flush buffer when batch is true and there are items in the buffer', () => {
       const { send } = stubCreateSocket();
 
       const target = new Socket({
