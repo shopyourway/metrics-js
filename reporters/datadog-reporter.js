@@ -8,7 +8,8 @@ module.exports = function DataDogReporter({
   port = 8125,
   prefix,
   batch = true,
-  maxBufferSize,
+  maxBufferSize = 1000,
+  flushInterval = 1000,
 }) {
   const metricsPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
   const socket = new Socket({
