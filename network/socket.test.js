@@ -282,6 +282,70 @@ describe('socket', () => {
 
         assert.strictEqual(send.calledOnce, true);
       });
+
+      it('should not send on interval when buffer is empty', async () => {
+        const { send } = stubCreateSocket();
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+          flushInterval: 100,
+        });
+
+        await new Promise(resolve => {
+          setTimeout(() => resolve(), 200);
+        });
+
+        assert.strictEqual(send.calledOnce, false);
+      });
+    });
+  });
+
+  describe('close', () => {
+    it('should flush buffer when batch is true and there are items in the buffer',  () => {
+      const { send } = stubCreateSocket();
+
+      const target = new Socket({
+        port: 1234,
+        host: '127.0.0.1',
+        buffer: true,
+        maxBufferSize: 30,
+      });
+
+      target.send({ message: 'a message from beyond' });
+
+      assert.strictEqual(send.called, false);
+
+      target.close();
+
+      assert.strictEqual(send.calledOnce, true);
+      assert.strictEqual(send.getCall(0).args[0].toString(), 'a message from beyond');
+    });
+
+    it('should clear interval', async () => {
+      const { send } = stubCreateSocket();
+
+      const target = new Socket({
+        port: 1234,
+        host: '127.0.0.1',
+        buffer: true,
+        maxBufferSize: 30,
+        flushInterval: 200,
+      });
+
+      target.send({ message: 'a message from beyond' });
+
+      assert.strictEqual(send.called, false);
+
+      target.close();
+
+      target.send({ message: 'second message' });
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      assert.strictEqual(send.calledOnce, true);
+      assert.strictEqual(send.getCall(0).args[0].toString(), 'a message from beyond');
     });
   });
 

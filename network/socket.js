@@ -38,6 +38,13 @@ module.exports = function Socket({
     }
   };
 
+  this.close = () => {
+    flushBuffer();
+    if (interval) {
+      clearInterval(interval);
+    }
+  };
+
   function append({ message, callback }) {
     buffer.push({ message, callback });
     bufferSize += message.length;
@@ -48,6 +55,10 @@ module.exports = function Socket({
   }
 
   function flushBuffer() {
+    if (buffer.length === 0) {
+      return;
+    }
+
     const bufferedMessage = buffer.map(x => x.message).join('\n');
     const callbacks = buffer.map(x => x.callback);
     // We capture the messages to send first to avoid concurrency issues for handling the buffer.
