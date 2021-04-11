@@ -23,8 +23,6 @@ module.exports = function Socket({
 
     const bytes = Buffer.from(message);
     socket.send(bytes, 0, bytes.length, port, host, err => {
-      socket.close();
-
       if (!callback) {
         return;
       }

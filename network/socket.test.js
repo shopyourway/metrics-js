@@ -149,7 +149,6 @@ describe('socket', () => {
     const socketStub = {
       send: sinon.stub(),
       unref: sinon.stub(),
-      close: sinon.stub(),
     };
     createSocketStub.withArgs('udp4').returns(socketStub);
 
