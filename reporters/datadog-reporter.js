@@ -11,7 +11,9 @@ module.exports = function DataDogReporter({
   connectCallback,
 }) {
   const metricsPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
-  const socket = new Socket({ port, host, batch, connectCallback });
+  const socket = new Socket({
+    port, host, batch, connectCallback,
+  });
 
   this.report = (key, value, tags, errorCallback) => {
     send(key, value, 'ms', tags, errorCallback);
@@ -28,7 +30,7 @@ module.exports = function DataDogReporter({
   function send(key, value, type, tags, errorCallback) {
     const stat = `${metricsPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
 
-    socket.send(stat, errorCallback);
+    socket.send({ message: stat, callback: errorCallback });
   }
 
   function stringifyTags(tags) {

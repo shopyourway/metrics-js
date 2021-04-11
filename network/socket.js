@@ -1,29 +1,19 @@
 const dgram = require('dgram');
 
 module.exports = function Socket({
-  port, host, batch = true, connectCallback,
+  port, host, batch = true,
 }) {
-  const socket = connect();
+  const socket = dgram.createSocket('udp4');
+  socket.unref();
 
-  this.send = (message, callback) => {
+  this.send = ({ message, callback }) => {
     const bytes = Buffer.from(message);
-    socket.send(bytes, err => {
-      if (callback) {
+    socket.send(bytes, 0, bytes.length, port, host, err => {
+      socket.close();
+
+      if (err && typeof callback === 'function') {
         callback(err);
       }
     });
   };
-
-  function connect() {
-    // eslint-disable-next-line no-shadow
-    const socket = dgram.createSocket('udp4');
-    socket.unref();
-    socket.connect(port, host, err => {
-      if (typeof connectCallback === 'function') {
-        connectCallback(err);
-      }
-    });
-
-    return socket;
-  }
 };

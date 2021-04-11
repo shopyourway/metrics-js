@@ -42,7 +42,7 @@ describe('DataDogReporter', () => {
     }));
 
     it('should use the default DataDog port if no port is provided', () => new Promise(done => {
-      const { connect } = stubCreateSocket();
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -52,9 +52,9 @@ describe('DataDogReporter', () => {
       const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
 
       wrappedFunc(1, 1, () => {
-        assert.ok(connect.calledOnce);
-        const { args } = connect.getCall(0);
-        const result = args[0];
+        assert.ok(send.calledOnce);
+        const { args } = send.getCall(0);
+        const result = args[3];
         assert.equal(result, expected);
         done();
       });
@@ -146,7 +146,7 @@ describe('DataDogReporter', () => {
     });
 
     it('should use the default DataDog port if no port is provided', () => {
-      const { connect } = stubCreateSocket();
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -154,9 +154,9 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.value').value(5);
 
-      assert.ok(connect.calledOnce);
-      const { args } = connect.getCall(0);
-      const result = args[0];
+      assert.ok(send.calledOnce);
+      const { args } = send.getCall(0);
+      const result = args[3];
       assert.equal(result, expected);
     });
 
@@ -228,7 +228,7 @@ describe('DataDogReporter', () => {
     });
 
     it('should use the default DataDog port if no port is provided', () => {
-      const { connect } = stubCreateSocket();
+      const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4' };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
@@ -236,9 +236,9 @@ describe('DataDogReporter', () => {
 
       metrics.space('metric.test.inc').increment(5);
 
-      assert.ok(connect.calledOnce);
-      const { args } = connect.getCall(0);
-      const result = args[0];
+      assert.ok(send.calledOnce);
+      const { args } = send.getCall(0);
+      const result = args[3];
       assert.equal(result, expected);
     });
 
@@ -300,7 +300,6 @@ function getAsyncFunc(duration) {
 function stubCreateSocket() {
   const socketStub = {
     send: sinon.spy(),
-    connect: sinon.spy(),
     unref: sinon.spy(),
   };
   createSocketStub.withArgs('udp4').returns(socketStub);
