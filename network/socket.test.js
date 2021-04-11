@@ -159,9 +159,12 @@ describe('socket', () => {
           maxBufferSize: 100,
         });
 
+        const callback = sinon.stub();
+
         target.send({ message: 'a message from beyond' });
 
-        assert.strictEqual(send.calledOnce, false);
+        assert.strictEqual(send.called, false, 'Send was called');
+        assert.strictEqual(callback.called, false, 'callback was called');
       });
 
       it('should send message when buffer is filled', () => {
@@ -216,6 +219,46 @@ describe('socket', () => {
 
         assert.strictEqual(send.calledTwice, true);
         assert.strictEqual(send.getCall(1).args[0].toString(), 'a third message\na forth message, too many messages, so little time');
+      });
+
+      it('should trigger all the callbacks when buffer is flushed', () => {
+        const { send } = stubCreateSocket();
+        send.callsArg(5);
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+        });
+
+        const callback1 = sinon.stub();
+        const callback2 = sinon.stub();
+
+        target.send({ message: 'a message from beyond', callback: callback1 });
+        target.send({ message: 'another message from beyond', callback: callback2 });
+
+        assert.strictEqual(callback1.calledOnce, true);
+        assert.strictEqual(callback2.calledOnce, true);
+      });
+
+      it('should trigger defined callbacks when buffer is flushed', () => {
+        const { send } = stubCreateSocket();
+        send.callsArg(5);
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+        });
+
+        const callback = sinon.stub();
+
+        target.send({ message: 'a message from beyond', callback });
+        target.send({ message: 'another message from beyond' });
+
+        assert.strictEqual(callback.calledOnce, true);
       });
     });
   });

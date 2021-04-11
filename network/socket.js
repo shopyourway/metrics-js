@@ -32,17 +32,23 @@ module.exports = function Socket({
   };
 
   function append({ message, callback }) {
-    buffer.push(message);
+    buffer.push({ message, callback });
     bufferSize += message.length;
 
     if (bufferSize > maxBufferSize) {
-      const bufferedMessage = buffer.join('\n');
+      const bufferedMessage = buffer.map(x => x.message).join('\n');
+      const callbacks = buffer.map(x => x.callback);
       // We capture the messages to send first to avoid concurrency issues for handling the buffer.
       // If we purge it after, new messages added to the buffer won't be sent, or worse, resent.
       bufferSize = 0;
       buffer = [];
 
-      sendImmediate({ message: bufferedMessage });
+      sendImmediate({
+        message: bufferedMessage,
+        callback: err => {
+          callbacks.filter(cb => cb).forEach(cb => cb(err));
+        },
+      });
     }
   }
 
