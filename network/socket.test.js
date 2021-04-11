@@ -260,6 +260,28 @@ describe('socket', () => {
 
         assert.strictEqual(callback.calledOnce, true);
       });
+
+      it('should send message after interval even if buffer is not full', async () => {
+        const { send } = stubCreateSocket();
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+          flushInterval: 100,
+        });
+
+        target.send({ message: 'a message from beyond' });
+
+        assert.strictEqual(send.called, false);
+
+        await new Promise(resolve => {
+          setTimeout(() => resolve(), 200);
+        });
+
+        assert.strictEqual(send.calledOnce, true);
+      });
     });
   });
 
