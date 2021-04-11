@@ -27,6 +27,10 @@ module.exports = function DataDogReporter({
     send(key, value, 'c', tags, errorCallback);
   };
 
+  this.close = () => {
+    socket.close();
+  };
+
   function send(key, value, type, tags, errorCallback) {
     const stat = `${metricsPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
 
