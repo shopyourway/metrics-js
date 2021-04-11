@@ -21,7 +21,7 @@ describe('DataDogReporter', () => {
     it('should send data to DataDog in the form of "key:value|ms"', () => new Promise(done => {
       const { send } = stubCreateSocket();
       stubDateNow(1464260419000);
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -43,7 +43,7 @@ describe('DataDogReporter', () => {
 
     it('should use the default DataDog port if no port is provided', () => new Promise(done => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -62,7 +62,7 @@ describe('DataDogReporter', () => {
 
     it('should add a valid prefix to the key when one is provided with a trailing dot', () => new Promise(done => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', prefix: 'prefix.' };
+      const options = { host: '1.2.3.4', prefix: 'prefix.', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -81,7 +81,7 @@ describe('DataDogReporter', () => {
 
     it('should add a valid prefix to the key when one is provided without a trailing dot', () => new Promise(done => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', prefix: 'prefix' };
+      const options = { host: '1.2.3.4', prefix: 'prefix', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -101,7 +101,7 @@ describe('DataDogReporter', () => {
     it('when tags are specified, should send data to DataDog in the form of "key:value|ms|#tag:value"', () => new Promise(done => {
       const { send } = stubCreateSocket();
       stubDateNow(1464260419000);
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -133,7 +133,7 @@ describe('DataDogReporter', () => {
 
     it('should send data to DataDog in the form of "key:value|g"', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 
@@ -147,7 +147,7 @@ describe('DataDogReporter', () => {
 
     it('should use the default DataDog port if no port is provided', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const expected = 8125;
@@ -162,7 +162,7 @@ describe('DataDogReporter', () => {
 
     it('should add a valid prefix to the key when one is provided with a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', prefix: 'prefix.' };
+      const options = { host: '1.2.3.4', prefix: 'prefix.', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const expected = 'prefix.metric.test.value:10|g';
@@ -177,7 +177,7 @@ describe('DataDogReporter', () => {
 
     it('should add a valid prefix to the key when one is provided without a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', prefix: 'prefix' };
+      const options = { host: '1.2.3.4', prefix: 'prefix', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const expected = 'prefix.metric.test.value:20|g';
@@ -192,7 +192,7 @@ describe('DataDogReporter', () => {
 
     it('when tags are specified, should send data to DataDog in the form of "key:value|g|#tag:value"', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 
@@ -215,7 +215,7 @@ describe('DataDogReporter', () => {
 
     it('should send data to DataDog in the form of "key:value|c"', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 
@@ -229,7 +229,7 @@ describe('DataDogReporter', () => {
 
     it('should use the default DataDog port if no port is provided', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const expected = 8125;
@@ -244,7 +244,7 @@ describe('DataDogReporter', () => {
 
     it('should add a valid prefix to the key when one is provided with a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', prefix: 'prefix.' };
+      const options = { host: '1.2.3.4', prefix: 'prefix.', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const expected = 'prefix.metric.test.inc:10|c';
@@ -259,7 +259,7 @@ describe('DataDogReporter', () => {
 
     it('should add a valid prefix to the key when one is provided without a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', prefix: 'prefix' };
+      const options = { host: '1.2.3.4', prefix: 'prefix', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
       const expected = 'prefix.metric.test.inc:20|c';
@@ -274,7 +274,7 @@ describe('DataDogReporter', () => {
 
     it('when tags are specified, should send data to DataDog in the form of "key:value|c|#tag:value"', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4' };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics([reporter]);
 

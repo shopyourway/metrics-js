@@ -7,7 +7,7 @@ module.exports = function DataDogReporter({
   defaultTags,
   port = 8125,
   prefix,
-  batch = false,
+  batch = true,
   maxBufferSize,
 }) {
   const metricsPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
