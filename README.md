@@ -1,8 +1,10 @@
 # Metrics
 Metrics is a time series reporting framework for to aggregators and metrics collectors such as [Graphite](https://graphiteapp.org/).
 
+[![npm][npm-image]][npm-url]
 ![Lint and tests](https://github.com/ysa23/metrics-js/workflows/Lint%20and%20tests/badge.svg)
 ![Node.js Publish to NPM](https://github.com/ysa23/metrics-js/workflows/Node.js%20Publish%20to%20NPM/badge.svg)
+
 
 ## Highlights
 * Time series reporting
@@ -267,3 +269,6 @@ Read [GitHub Help](https://help.github.com/articles/about-pull-requests/) for mo
 
 ### Running tests
 To run tests, in command line run `npm test`
+
+[npm-image]: https://img.shields.io/npm/v/metrics-reporter.svg?style=rounded-square
+[npm-url]: https://npmjs.org/package/metrics-reporter
