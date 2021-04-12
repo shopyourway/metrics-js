@@ -158,14 +158,22 @@ const { Metrics, DataDogReporter } = require('metrics-reporter');
 const agentHost = '1.1.1.1'; // DataDog agent IP address
 const port = 8125; // Optional - port number. Defaults to 8125
 const spacePrefix = 'My.Project'; // Optional - prefix to all metrics spaces
+const batch = true; // Indicates that metrics will be sent in batches. Default - true
+const maxBufferSize = 500; // Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately. Default - 1000
+const flushInterval = 1000; // Time in milliseconds. Indicates how often the buffer is flushed in case batch = true. Default - 1000 (1s)
 
 const datadogReporter = new DataDogReporter({
-		host: agentHost,
-		port: port,
-		prefix: spacePrefix
-	});
+    host: agentHost,
+    port,
+    prefix: spacePrefix,
+    batch,
+    maxBufferSize,
+    flushInterval,
+});
 
 const metrics = new Metrics([datadogReporter], errorCallback);
+
+datadogReporter.close(); // close should be called when the application terminates
 ```
 Note that you'll need a running [DataDog agent](https://docs.datadoghq.com/agent/). In the `/docker` folder there's a simple docker compose for datadog to get you started
 

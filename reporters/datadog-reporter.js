@@ -1,11 +1,20 @@
-const dgram = require('dgram');
+const Socket = require('../network/socket');
 
 const redundantDotsRegex = new RegExp('\\.\\.+', 'g');
 
-module.exports = function DataDogReporter(opts) {
-  const { host, defaultTags } = opts;
-  const port = opts.port || 8125;
-  const prefix = typeof opts.prefix === 'string' && opts.prefix.length ? removeRedundantDots(`${opts.prefix}.`) : '';
+module.exports = function DataDogReporter({
+  host,
+  defaultTags,
+  port = 8125,
+  prefix,
+  batch = true,
+  maxBufferSize = 1000,
+  flushInterval = 1000,
+}) {
+  const metricsPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
+  const socket = new Socket({
+    port, host, batch, maxBufferSize, flushInterval,
+  });
 
   this.report = (key, value, tags, errorCallback) => {
     send(key, value, 'ms', tags, errorCallback);
@@ -19,19 +28,14 @@ module.exports = function DataDogReporter(opts) {
     send(key, value, 'c', tags, errorCallback);
   };
 
+  this.close = () => {
+    socket.close();
+  };
+
   function send(key, value, type, tags, errorCallback) {
-    const stat = `${prefix}${key}:${value}|${type}${stringifyTags(tags)}`;
+    const stat = `${metricsPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
 
-    const socket = dgram.createSocket('udp4');
-    const buff = Buffer.from(stat);
-
-    socket.send(buff, 0, buff.length, port, host, err => {
-      socket.close();
-
-      if (err && typeof errorCallback === 'function') {
-        errorCallback(err);
-      }
-    });
+    socket.send({ message: stat, callback: errorCallback });
   }
 
   function stringifyTags(tags) {

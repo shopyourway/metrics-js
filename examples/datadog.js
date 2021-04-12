@@ -13,3 +13,6 @@ const dataDogReporter = new DataDogReporter({
 const metrics = new Metrics([dataDogReporter]);
 
 metrics.space('example.metrics.datadog', { tag1: 'value1', env: 'test' }).value(123);
+
+// DataDog reporter requires to be closed - in order to flush pending metric reports
+dataDogReporter.close();
