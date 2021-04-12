@@ -39,7 +39,7 @@ module.exports = function DataDogReporter({
   }
 
   function stringifyTags(tags) {
-    if (!tags) {
+    if (!tags && !defaultTags) {
       return '';
     }
 

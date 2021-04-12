@@ -285,6 +285,20 @@ describe('DataDogReporter', () => {
       const result = args[0].toString();
       assert.equal(result, 'metric.test.inc:10|c|#tag1:value1,tag2:value2');
     });
+
+    it('when only default tags are specified, should send data to DataDog in the form of "key:value|c|#tag:value"', () => {
+      const { send } = stubCreateSocket();
+      const options = { host: '1.2.3.4', batch: false, defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('metric.test.inc').increment(10);
+
+      const { args } = send.getCall(0);
+      assert.ok(send.calledOnce);
+      const result = args[0].toString();
+      assert.equal(result, 'metric.test.inc:10|c|#tag1:value1,tag2:value2');
+    });
   });
 });
 
