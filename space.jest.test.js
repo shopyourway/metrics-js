@@ -425,7 +425,6 @@ describe('Space', () => {
       metrics.space('space', { source: 'test' }).space('subspace').space('Foo', { cause: 'error' }).space('Bar')
         .increment();
 
-
       expect(reports).toHaveLength(1);
       const report = reports[0];
 
