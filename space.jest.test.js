@@ -1,5 +1,3 @@
-const assert = require('assert');
-const sinon = require('sinon');
 const { Metrics, InMemoryReporter } = require('./index');
 
 describe('Space', () => {
@@ -8,23 +6,20 @@ describe('Space', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
-      try {
-        metrics.space('SYW.Adder').meter();
-      } catch (e) {
-        assert.equal(e.message, 'must pass a function as argument');
-      }
+
+      expect(() => metrics.space('space.meter').meter()).toThrow('must pass a function as argument');
     });
 
-    context('called on a promise', () => {
+    describe('called on a promise', () => {
       it('should return a Promise', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getPromise(1000);
 
-        const result = metrics.space('SYW.Adder').meter(func);
+        const result = metrics.space('space.meter').meter(func);
 
-        assert.equal(result instanceof Promise, true);
+        expect(result).toBeInstanceOf(Promise);
       });
 
       it('upon promise resolve, should create a report where the value is the execution time of the original function it receives as argument', async () => {
@@ -47,15 +42,9 @@ describe('Space', () => {
         const metrics = new Metrics([reporter]);
         const func = getPromiseError(1000);
 
-        let errorThrown = false;
-        try {
-          await metrics.space('SYW.Adder').meter(func);
-        } catch (err) {
-          errorThrown = true;
-        }
+        await expect(() => metrics.space('space.meter').meter(func)).rejects.toThrow();
 
-        assert.equal(errorThrown, true, 'Error was swallowed. It needs to be thrown');
-        assert.equal(reports.length, 1);
+        expect(reports).toHaveLength(1);
 
         const report = reports[reports.length - 1];
         const result = report.value;
@@ -64,17 +53,17 @@ describe('Space', () => {
       });
     });
 
-    context('called on a async function', () => {
+    describe('called on a async function', () => {
       it('should return a async function', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getAsyncFunction(1000);
 
-        const result = metrics.space('SYW.Adder').meter(func);
+        const result = metrics.space('space.meter').meter(func);
 
-        assert.equal(typeof result, 'function');
-        assert.equal(result.constructor.name, 'AsyncFunction');
+        expect(typeof result).toBe('function');
+        expect(result.constructor.name).toEqual('AsyncFunction');
       });
 
       it('upon await successful execution, should create a report where the value is the execution time of the original function it receives as argument', async () => {
@@ -83,7 +72,7 @@ describe('Space', () => {
         const metrics = new Metrics([reporter]);
         const func = getAsyncFunction(1000);
 
-        const wrapper = metrics.space('SYW.Adder').meter(func);
+        const wrapper = metrics.space('space.meter').meter(func);
         await wrapper();
 
         const report = reports[reports.length - 1];
@@ -98,16 +87,10 @@ describe('Space', () => {
         const metrics = new Metrics([reporter]);
         const func = getAsyncErrorFunction(1000);
 
-        let errorThrown = false;
-        try {
-          const wrapper = metrics.space('SYW.Adder').meter(func);
-          await wrapper();
-        } catch (err) {
-          errorThrown = true;
-        }
+        const wrapper = metrics.space('space.meter').meter(func);
+        await expect(() => wrapper()).rejects.toThrow();
 
-        assert.equal(errorThrown, true, 'Error was swallowed. It needs to be thrown');
-        assert.equal(reports.length, 1);
+        expect(reports).toHaveLength(1);
 
         const report = reports[reports.length - 1];
         const result = report.value;
@@ -116,16 +99,16 @@ describe('Space', () => {
       });
     });
 
-    context('called on a callback function', () => {
+    describe('called on a callback function', () => {
       it('should return a function', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getCallbackFunc(1000);
 
-        const result = metrics.space('SYW.Adder').meter(func);
+        const result = metrics.space('space.meter').meter(func);
 
-        assert.equal(typeof result, 'function');
+        expect(typeof result).toBe('function');
       });
 
       it('should create a report where the value is the execution time of the original function it receives as argument', done => {
@@ -133,7 +116,7 @@ describe('Space', () => {
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getCallbackFunc(1000);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         wrappedFunc(1, 1, () => {
           const report = reports[reports.length - 1];
@@ -149,13 +132,13 @@ describe('Space', () => {
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getCallbackFunc(1000);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         wrappedFunc(1, 1, () => {
           const report = reports[reports.length - 1];
           const result = report.key;
 
-          assert.equal(result, 'SYW.Adder');
+          expect(result).toBe('space.meter');
           done();
         });
       });
@@ -164,14 +147,11 @@ describe('Space', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = sinon.spy(getCallbackFunc(1000));
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const func = jest.fn(getCallbackFunc(1000));
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
-        wrappedFunc(1, 1, () => {
-          const args = func.args[0];
-          const result = args.slice(0, args.length - 1);
-
-          assert.deepEqual(result, [1, 1]);
+        wrappedFunc(1, 2, () => {
+          expect(func).toBeCalledWith(1, 2, expect.any(Function));
           done();
         });
       });
@@ -184,8 +164,8 @@ describe('Space', () => {
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
         wrappedFunc(1, 1, (err, result) => {
-          assert.equal(err, null);
-          assert.equal(result, 2);
+          expect(err).toBeNull();
+          expect(result).toBe(2);
           done();
         });
       });
@@ -194,40 +174,42 @@ describe('Space', () => {
         const reporter = new FailingReporter();
         const metrics = new Metrics([reporter]);
         const func = getCallbackFunc(1000);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         wrappedFunc(1, 1, (err, result) => {
-          assert.equal(err, null);
-          assert.equal(result, 2);
+          expect(err).toBeNull();
+          expect(result).toBe(2);
           done();
         });
       });
 
       it('should call the errback when a reporter throws an error', done => {
         const reporter = new FailingReporter();
-        const errback = sinon.spy();
+        const errback = jest.fn();
         const metrics = new Metrics([reporter], errback);
         const func = getCallbackFunc(1000);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         wrappedFunc(1, 1, () => {
-          assert.ok(errback.calledOnce);
-          assert.equal(errback.getCall(0).args[0].message, 'I just failed, did you expected something else?');
+          expect(errback).toBeCalledTimes(1);
+          expect(errback).toBeCalledWith(expect.objectContaining({
+            message: 'I just failed, did you expected something else?',
+          }));
           done();
         });
       });
     });
 
-    context('called on an synchronous function', () => {
+    describe('called on an synchronous function', () => {
       it('should return a function', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getSyncFunc(500);
 
-        const result = metrics.space('SYW.Adder').meter(func);
+        const result = metrics.space('space.meter').meter(func);
 
-        assert.equal(typeof result, 'function');
+        expect(typeof result).toBe('function');
       });
 
       it('should create a report where the value is the execution time of the original function it receives as argument', () => {
@@ -235,13 +217,14 @@ describe('Space', () => {
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getSyncFunc(500);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         wrappedFunc(1, 1);
         const report = reports[reports.length - 1];
         const result = report.value;
 
-        assert.ok(result >= 490 && result < 510);
+        expect(result).toBeGreaterThanOrEqual(490);
+        expect(result).toBeLessThan(510);
       });
 
       it('should create a report where the key is the argument passed to the Space constructor', () => {
@@ -249,26 +232,25 @@ describe('Space', () => {
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getSyncFunc(500);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         wrappedFunc(1, 1);
         const report = reports[reports.length - 1];
         const result = report.key;
 
-        assert.equal(result, 'SYW.Adder');
+        expect(result).toBe('space.meter');
       });
 
       it('should call the original function with the same arguments that the wrapped function is called with', () => {
         const reports = [];
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
-        const func = sinon.spy(getSyncFunc(500));
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const func = jest.fn(getSyncFunc(500));
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
-        wrappedFunc(1, 1);
-        const result = func.args[0];
+        wrappedFunc(1, 2);
 
-        assert.deepEqual(result, [1, 1]);
+        expect(func).toBeCalledWith(1, 2);
       });
 
       it('should return the result of the original function', () => {
@@ -276,35 +258,37 @@ describe('Space', () => {
         const reporter = new InMemoryReporter(reports);
         const metrics = new Metrics([reporter]);
         const func = getSyncFunc(500);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         const result = wrappedFunc(1, 1);
 
-        assert.equal(result, 2);
+        expect(result).toBe(2);
       });
 
       it('should not throw an error when a reporter throws an error', () => {
         const reporter = new FailingReporter();
         const metrics = new Metrics([reporter]);
         const func = getSyncFunc(500);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         const result = wrappedFunc(1, 1);
 
-        assert.equal(result, 2);
+        expect(result).toBe(2);
       });
 
       it('should call the errback when a reporter throws an error', () => {
         const reporter = new FailingReporter();
-        const errback = sinon.spy();
+        const errback = jest.fn();
         const metrics = new Metrics([reporter], errback);
         const func = getSyncFunc(500);
-        const wrappedFunc = metrics.space('SYW.Adder').meter(func);
+        const wrappedFunc = metrics.space('space.meter').meter(func);
 
         wrappedFunc(1, 1);
 
-        assert.ok(errback.calledOnce);
-        assert.equal(errback.getCall(0).args[0].message, 'I just failed, did you expected something else?');
+        expect(errback).toBeCalledTimes(1);
+        expect(errback).toBeCalledWith(expect.objectContaining({
+          message: 'I just failed, did you expected something else?',
+        }));
       });
     });
   });
@@ -315,13 +299,13 @@ describe('Space', () => {
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
       const func = getSyncFunc(500);
-      const wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
 
       wrappedFunc(1, 1);
       const report = reports[reports.length - 1];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
+      expect(report.key).toBe('space.subspace.Foo.Bar');
     });
 
     it('when space has tags, should create a report with all the tags from all spaces', () => {
@@ -330,31 +314,32 @@ describe('Space', () => {
       const metrics = new Metrics([reporter]);
       const func = getSyncFunc(500);
 
-      const wrappedFunc = metrics.space('SYW', { source: 'test' }).space('Adder').space('Foo', { cause: 'error' }).space('Bar')
+      const wrappedFunc = metrics.space('space', { source: 'test' }).space('subspace').space('Foo', { cause: 'error' }).space('Bar')
         .meter(func);
 
       wrappedFunc(1, 1);
       const report = reports[reports.length - 1];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
-      assert.deepEqual(report.tags, {
-        source: 'test',
-        cause: 'error',
-      });
+      expect(report).toEqual(expect.objectContaining({
+        key: 'space.subspace.Foo.Bar',
+        tags: {
+          source: 'test',
+          cause: 'error',
+        },
+      }));
     });
 
     it('should call the original function with the same arguments that the wrapped function is called with', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
-      const func = sinon.spy(getSyncFunc(500));
-      const wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      const func = jest.fn(getSyncFunc(500));
+      const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
 
-      wrappedFunc(1, 1);
-      const result = func.args[0];
+      wrappedFunc(1, 2);
 
-      assert.deepEqual(result, [1, 1]);
+      expect(func).toBeCalledWith(1, 2);
     });
 
     it('should return the result of the original function', () => {
@@ -362,26 +347,28 @@ describe('Space', () => {
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
       const func = getSyncFunc(500);
-      const wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
 
-      const result = wrappedFunc(1, 1);
+      const result = wrappedFunc(1, 2);
 
-      assert.equal(result, 2);
+      expect(result).toBe(3);
     });
 
     it('should call the errback when a reporter throws an error', () => {
       const reporter = new FailingReporter();
-      const errback = sinon.spy();
+      const errback = jest.fn();
       const metrics = new Metrics([reporter], errback);
       const func = getSyncFunc(500);
-      const wrappedFunc = metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
 
-      wrappedFunc(1, 1);
+      wrappedFunc(1, 2);
 
-      assert.ok(errback.calledOnce);
-      assert.equal(errback.getCall(0).args[0].message, 'I just failed, did you expected something else?');
+      expect(errback).toBeCalledTimes(1);
+      expect(errback).toBeCalledWith(expect.objectContaining({
+        message: 'I just failed, did you expected something else?',
+      }));
     });
   });
 
@@ -390,52 +377,62 @@ describe('Space', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
-      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      metrics.space('space').space('subspace').space('Foo').space('Bar')
         .increment();
 
-      assert.equal(reports.length, 1);
+      expect(reports).toHaveLength(1);
+
       let report = reports[0];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
-      assert.equal(report.value, 1);
+      expect(report).toEqual(expect.objectContaining({
+        key: 'space.subspace.Foo.Bar',
+        value: 1,
+      }));
 
-      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      metrics.space('space').space('subspace').space('Foo').space('Bar')
         .increment();
 
-      assert.equal(reports.length, 2);
+      expect(reports).toHaveLength(2);
       // eslint-disable-next-line prefer-destructuring
       report = reports[1];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
-      assert.equal(report.value, 2);
+      expect(report).toEqual(expect.objectContaining({
+        key: 'space.subspace.Foo.Bar',
+        value: 2,
+      }));
     });
 
     it('when value is specified, increment by given value', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
-      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      metrics.space('space').space('subspace').space('Foo').space('Bar')
         .increment(3);
 
-      assert.equal(reports.length, 1);
+      expect(reports).toHaveLength(1);
       const report = reports[0];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
-      assert.equal(report.value, 3);
+      expect(report).toEqual(expect.objectContaining({
+        key: 'space.subspace.Foo.Bar',
+        value: 3,
+      }));
     });
 
     it('when tags are specified, key should have tags', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
-      metrics.space('SYW', { source: 'test' }).space('Adder').space('Foo', { cause: 'error' }).space('Bar')
+      metrics.space('space', { source: 'test' }).space('subspace').space('Foo', { cause: 'error' }).space('Bar')
         .increment();
 
-      assert.equal(reports.length, 1);
+
+      expect(reports).toHaveLength(1);
       const report = reports[0];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
-      assert.deepEqual(report.tags, { source: 'test', cause: 'error' });
+      expect(report).toEqual(expect.objectContaining({
+        key: 'space.subspace.Foo.Bar',
+        tags: { source: 'test', cause: 'error' },
+      }));
     });
   });
 
@@ -444,34 +441,39 @@ describe('Space', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
-      metrics.space('SYW').space('Adder').space('Foo').space('Bar')
+      metrics.space('space').space('subspace').space('Foo').space('Bar')
         .value(2);
 
-      assert.equal(reports.length, 1);
+      expect(reports).toHaveLength(1);
       const report = reports[0];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
-      assert.equal(report.value, 2);
+      expect(report).toEqual(expect.objectContaining({
+        key: 'space.subspace.Foo.Bar',
+        value: 2,
+      }));
     });
 
     it('when tags are specified, should set value', () => {
       const reports = [];
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
-      metrics.space('SYW', { source: 'test' }).space('Adder').space('Foo', { cause: 'error' }).space('Bar')
+      metrics.space('space', { source: 'test' }).space('subspace').space('Foo', { cause: 'error' }).space('Bar')
         .value(2);
 
-      assert.equal(reports.length, 1);
+      expect(reports).toHaveLength(1);
       const report = reports[0];
 
-      assert.equal(report.key, 'SYW.Adder.Foo.Bar');
-      assert.deepEqual(report.tags, { source: 'test', cause: 'error' });
+      expect(report).toEqual(expect.objectContaining({
+        key: 'space.subspace.Foo.Bar',
+        tags: { source: 'test', cause: 'error' },
+      }));
     });
   });
 });
 
 function assertReport(reportedTime) {
-  assert.ok(reportedTime >= 900 && reportedTime < 1100, `duration was ${reportedTime}`);
+  expect(reportedTime).toBeGreaterThanOrEqual(900);
+  expect(reportedTime).toBeLessThan(1100);
 }
 
 function getPromiseError(delay) {
