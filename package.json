@@ -9,13 +9,13 @@
     "datadog",
     "DogStatsD"
   ],
-  "version": "0.8.1",
+  "version": "0.8.2",
   "repository": {
     "type": "git",
     "url": "https://github.com/ysa23/metrics-js"
   },
   "scripts": {
-    "test": "mocha --recursive *.test.js **/*.test.js",
+    "test": "jest --runInBand --forceExit --detectOpenHandles",
     "lint": "eslint index.js .",
     "example:graphite": "node ./examples/graphite.js",
     "example:datadog": "node ./examples/datadog.js",
@@ -26,8 +26,9 @@
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-mocha": "^6.3.0",
-    "mocha": "*",
-    "sinon": "*"
+    "eslint-plugin-jest": "^24.3.5",
+    "jest": "^26.6.3",
+    "jest-when": "^3.2.1",
+    "jest-extended": "^0.11.5"
   }
 }

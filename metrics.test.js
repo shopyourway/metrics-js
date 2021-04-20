@@ -1,4 +1,3 @@
-const assert = require('assert');
 const { Metrics, InMemoryReporter } = require('./index');
 
 describe('Metrics', () => {
@@ -8,15 +7,8 @@ describe('Metrics', () => {
       const validReporter = new InMemoryReporter(reports);
       const invalidReporter = null;
 
-      let errMsg;
-      try {
-        // eslint-disable-next-line no-new
-        new Metrics([validReporter, invalidReporter]);
-      } catch (e) {
-        errMsg = e.message;
-      }
-
-      assert.equal(errMsg, 'must pass valid reporters with a `report` function');
+      expect(() => new Metrics([validReporter, invalidReporter]))
+        .toThrow('must pass valid reporters with a `report` function');
     });
 
     it('should throw an error if called with reporters that does not have report function', () => {
@@ -25,15 +17,8 @@ describe('Metrics', () => {
       const invalidReporter = new InMemoryReporter([]);
       invalidReporter.report = undefined;
 
-      let errMsg;
-      try {
-        // eslint-disable-next-line no-new
-        new Metrics([validReporter, invalidReporter]);
-      } catch (e) {
-        errMsg = e.message;
-      }
-
-      assert.equal(errMsg, 'must pass valid reporters with a `report` function');
+      expect(() => new Metrics([validReporter, invalidReporter]))
+        .toThrow('must pass valid reporters with a `report` function');
     });
 
     it('should throw an error if called with reporters that does not have value function', () => {
@@ -42,15 +27,8 @@ describe('Metrics', () => {
       const invalidReporter = new InMemoryReporter([]);
       invalidReporter.value = undefined;
 
-      let errMsg;
-      try {
-        // eslint-disable-next-line no-new
-        new Metrics([validReporter, invalidReporter]);
-      } catch (e) {
-        errMsg = e.message;
-      }
-
-      assert.equal(errMsg, 'must pass valid reporters with a `report` function');
+      expect(() => new Metrics([validReporter, invalidReporter]))
+        .toThrow('must pass valid reporters with a `report` function');
     });
 
     it('should throw an error if called with reporters that does not have increment function', () => {
@@ -59,15 +37,8 @@ describe('Metrics', () => {
       const invalidReporter = new InMemoryReporter([]);
       invalidReporter.increment = undefined;
 
-      let errMsg;
-      try {
-        // eslint-disable-next-line no-new
-        new Metrics([validReporter, invalidReporter]);
-      } catch (e) {
-        errMsg = e.message;
-      }
-
-      assert.equal(errMsg, 'must pass valid reporters with a `report` function');
+      expect(() => new Metrics([validReporter, invalidReporter]))
+        .toThrow('must pass valid reporters with a `report` function');
     });
   });
 
@@ -78,11 +49,7 @@ describe('Metrics', () => {
       const metrics = new Metrics([reporter]);
       const func = () => {};
 
-      assert.throws(() => {
-        metrics.space(func);
-      }, {
-        message: 'must pass non-empty key string as argument',
-      });
+      expect(() => metrics.space(func)).toThrow('must pass non-empty key string as argument');
     });
 
     it('when tags is a string, should throw error', () => {
@@ -90,11 +57,8 @@ describe('Metrics', () => {
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
 
-      assert.throws(() => {
-        metrics.space('metric.test', 'tag');
-      }, {
-        message: 'tags must be an object',
-      });
+      expect(() => metrics.space('metric.test', 'tag'))
+        .toThrow('tags must be an object');
     });
 
     it('when tags is an array, should throw error', () => {
@@ -102,11 +66,8 @@ describe('Metrics', () => {
       const reporter = new InMemoryReporter(reports);
       const metrics = new Metrics([reporter]);
 
-      assert.throws(() => {
-        metrics.space('metric.test', ['tag']);
-      }, {
-        message: 'tags must be an object',
-      });
+      expect(() => metrics.space('metric.test', ['tag']))
+        .toThrow('tags must be an object');
     });
 
     it('should return a `Space` object', () => {
@@ -116,7 +77,7 @@ describe('Metrics', () => {
 
       const result = metrics.space('metric.test');
 
-      assert.equal(result.constructor.name, 'Space');
+      expect(result.constructor.name).toEqual('Space');
     });
   });
 });
