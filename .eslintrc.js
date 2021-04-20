@@ -1,5 +1,5 @@
 module.exports = {
-    plugins: ['mocha','jest'],
+    plugins: ['jest'],
     extends: ['airbnb-base'],
     rules: {
         'arrow-parens': [2, "as-needed"],
@@ -16,7 +16,6 @@ module.exports = {
     },
     env: {
         node: true,
-        'mocha': true,
         'jest/globals': true,
     },
     globals: {
