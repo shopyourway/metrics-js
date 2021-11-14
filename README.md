@@ -48,7 +48,7 @@ const { Metrics } = require('metrics-reporter');
 ```
 Initialize the metrics instance with the required reporters:
 ```js
-const { StringReporter, ConsoleReporter } = require('metrics-reporter')
+const { StringReporter, ConsoleReporter } = require('metrics-reporter');
 
 const stringReporter = new StringReporter(metricString => {
         // Do something
