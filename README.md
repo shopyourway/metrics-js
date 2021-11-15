@@ -199,7 +199,7 @@ Note that you'll need a running [DataDog agent](https://docs.datadoghq.com/agent
 #### Console
 Console reporter comes in handy when you need to debug metrics calls:
 ```js
-const Metrics = require('metrics-reporter').Metrics;
+const { Metrics } = require('metrics-reporter');
 
 const consoleReporter = new require('metrics-reporter').ConsoleReporter();
 	
@@ -209,7 +209,7 @@ When a metrics will be reported, a message will appear in the terminal, that inc
 
 #### String
 ```js
-const Metrics = require('metrics-reporter').Metrics;
+const { Metrics } = require('metrics-reporter');
 const fs = require('fs');
 
 const stringReporter = new require('metrics-reporter').StringReporter(metricString => {
