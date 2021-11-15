@@ -70,16 +70,32 @@ const metric = metrics.space('http').space('requests'); // http.requests
 
 #### Execution time
 Use the `meter` method on a `Space` to report execution time of a function:
-```js
-metrics.space('users.get').meter(function(userIds, callback) {
+```javascript
+const wrapper = metrics.space('users.get').meter(function(userIds, callback) {
 	// read users from database
 	callback(...);
 });
+
+wrapper([1, 2, 3], (err, result) => { console.log(result); });
 ```
 The `meter` method can receive:
 * A function with a callback (as the last parameter)
 * Promise
 * Async function
+
+`meter` returns a **wrapper** around the object that was sent.
+In order to start measuring **invoke** it according to its type. For example:
+```javascript
+// Sync invocation
+const wrapperSync = metrics.space('add').meter((a, b) => a + b);
+const result = wrapperSync(1, 2);
+
+// Promise invocation
+const wrapperPromise = metrics.space('timeout').meter(new Promise(function(resolve) {
+  setTimeout(10000, () => console.log('hello'));
+}));
+await wrapperPromise();
+```
 
 The meter function will run your code, while measuring the time it took to execute, and report it to the configured reporters.
 
@@ -91,8 +107,9 @@ If an async function is measured, you can await on it and get its returned value
 ```js
 const result = await metrics.space('users.get').meter(async () => {
     // Some async code here
-});
+})();
 ```
+Please note the invocation on the return value.
 
 #### Value
 Use the `Metrics` instance to report a value:
