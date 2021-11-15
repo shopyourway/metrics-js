@@ -92,7 +92,7 @@ const result = wrapperSync(1, 2);
 
 // Promise invocation
 const wrapperPromise = metrics.space('timeout').meter(new Promise(function(resolve) {
-  setTimeout(10000, () => console.log('hello'));
+  setTimeout(() => console.log('hello'), 10000);
 }));
 await wrapperPromise();
 ```
