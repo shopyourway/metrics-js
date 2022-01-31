@@ -12,4 +12,14 @@ const graphiteReporter = new GraphiteReporter({
 
 const metrics = new Metrics([graphiteReporter]);
 
-metrics.space('example.metrics.graphite').value(123);
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+(async () => {
+  for (let i = 0; i < 100; i++) {
+    metrics.space('example.metrics.graphite').value(i);
+    // eslint-disable-next-line no-await-in-loop
+    await timeout(10);
+  }
+})();
