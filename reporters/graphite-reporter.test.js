@@ -62,6 +62,54 @@ describe('GraphiteReporter', () => {
       });
     }));
 
+    it('should append default tags to to the metric report', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      setDate(1464260419000);
+      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        const args = send.mock.calls[0];
+        const result = parseReport(args[0].toString());
+
+        expect(result.key).toEqual('metric.test');
+        expect(result.value).toBeGreaterThanOrEqual(900);
+        expect(result.value).toBeLessThanOrEqual(1100);
+        expect(result.type).toEqual('ms');
+        expect(result.addtionalParts[0]).toEqual('#tag1:value1,tag2:value2');
+        done();
+      });
+    }));
+
+    it('should merge default tags and metric level tags', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      setDate(1464260419000);
+      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        const args = send.mock.calls[0];
+        const result = parseReport(args[0].toString());
+
+        expect(result.key).toEqual('metric.test');
+        expect(result.value).toBeGreaterThanOrEqual(900);
+        expect(result.value).toBeLessThanOrEqual(1100);
+        expect(result.type).toEqual('ms');
+        expect(result.addtionalParts[0]).toEqual('#tag1:value1,tag2:overridden,tag3:value3');
+        done();
+      });
+    }));
+
     it('should use the default Graphite port if no port is provided', () => new Promise(done => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4' };
@@ -154,6 +202,34 @@ describe('GraphiteReporter', () => {
       expect(result).toEqual('metric.test:5|v|#tag1:value1,tag2:value2');
     });
 
+    it('should append default tags when default tags are available', () => {
+      const { send } = stubCreateSocket();
+      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('metric.test').value(5);
+
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('metric.test:5|v|#tag1:value1,tag2:value2');
+    });
+
+    it('should merge default tags and metric level tags', () => {
+      const { send } = stubCreateSocket();
+      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).value(5);
+
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('metric.test:5|v|#tag1:value1,tag2:overridden,tag3:value3');
+    });
+
     it('should use the default Graphite port if no port is provided', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4' };
@@ -229,6 +305,46 @@ describe('GraphiteReporter', () => {
       const args = send.mock.calls[0];
       const result = args[0].toString();
       expect(result).toEqual('metric.test:10|c|#tag1:value1,tag2:value2');
+    });
+
+    it('should append default tags to report when default tags are available', () => {
+      const { send } = stubCreateSocket();
+      const graphiteOptions = {
+        host: '1.2.3.4',
+        defaultTags: {
+          tag1: 'value1',
+          tag2: 'value2',
+        },
+      };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('metric.test').increment(10);
+
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('metric.test:10|c|#tag1:value1,tag2:value2');
+    });
+
+    it('should merge default tags and metric level tags on report', () => {
+      const { send } = stubCreateSocket();
+      const graphiteOptions = {
+        host: '1.2.3.4',
+        defaultTags: {
+          tag1: 'value1',
+          tag2: 'value2',
+        },
+      };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).increment(10);
+
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('metric.test:10|c|#tag1:value1,tag2:overridden,tag3:value3');
     });
 
     it('should use the default Graphite port if no port is provided', () => {
