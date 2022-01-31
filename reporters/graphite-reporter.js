@@ -22,7 +22,7 @@ module.exports = function GraphiteReporter({
   }
 
   function send(key, value, type, tags, errorCallback) {
-    const stat = `${metricPrefix}${key}:${value}|${type}`;
+    const stat = `${metricPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
     const socket = dgram.createSocket('udp4');
     const buff = Buffer.from(stat);
 
@@ -33,6 +33,18 @@ module.exports = function GraphiteReporter({
         errorCallback(err);
       }
     });
+  }
+
+  function stringifyTags(tags) {
+    if (!tags) {
+      return '';
+    }
+
+    const allTags = {
+      ...tags,
+    };
+
+    return `|#${Object.entries(allTags).map(([key, value]) => `${key}:${value}`).join(',')}`;
   }
 
   return {

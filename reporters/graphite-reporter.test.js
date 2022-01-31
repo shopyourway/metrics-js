@@ -57,7 +57,7 @@ describe('GraphiteReporter', () => {
         expect(result.value).toBeGreaterThanOrEqual(900);
         expect(result.value).toBeLessThanOrEqual(1100);
         expect(result.type).toEqual('ms');
-        expect(result.addtionalParts).toEqual('#tag1:value1,tag2:value2');
+        expect(result.addtionalParts[0]).toEqual('#tag1:value1,tag2:value2');
         done();
       });
     }));
@@ -144,15 +144,13 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      let error;
       const metrics = new Metrics([reporter]);
 
       metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).value(5);
 
-      expect(send).not.toBeCalled();
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
-      const result = parseReport(args[0].toString());
+      const result = args[0].toString();
       expect(result).toEqual('metric.test:5|v|#tag1:value1,tag2:value2');
     });
 
@@ -223,15 +221,14 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      let error;
-      const metrics = new Metrics([reporter], e => { error = e; });
+      const metrics = new Metrics([reporter]);
 
       metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).increment(10);
 
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
       const result = args[0].toString();
-      expect(result).toEqual('space.subspace:10|c|#tag1:value1,tag2:value2');
+      expect(result).toEqual('metric.test:10|c|#tag1:value1,tag2:value2');
     });
 
     it('should use the default Graphite port if no port is provided', () => {
