@@ -28,30 +28,36 @@ describe('GraphiteReporter', () => {
       wrappedFunc(1, 1, () => {
         expect(send).toBeCalledTimes(1);
         const args = send.mock.calls[0];
-        const resultParts = splitGraphite(args[0].toString());
+        const result = parseReport(args[0].toString());
 
-        expect(resultParts[0]).toEqual('space.subspace');
-        expect(resultParts[1]).toBeGreaterThanOrEqual(900);
-        expect(resultParts[1]).toBeLessThanOrEqual(1100);
-        expect(resultParts[2]).toEqual('ms');
+        expect(result.key).toEqual('space.subspace');
+        expect(result.value).toBeGreaterThanOrEqual(900);
+        expect(result.value).toBeLessThanOrEqual(1100);
+        expect(result.type).toEqual('ms');
         done();
       });
     }));
 
-    it('when tags are used, should report error to callback and do not report metric', () => new Promise(done => {
+    it('should append tags to to the metric report', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
       const graphiteOptions = { host: '1.2.3.4' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      let error;
-      const metrics = new Metrics([reporter], e => { error = e; });
+      const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
 
-      const wrappedFunc = metrics.space('metric.test', { tag1: 'value1' }).meter(func);
+      const wrappedFunc = metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).meter(func);
 
       wrappedFunc(1, 1, () => {
-        expect(send).not.toBeCalled();
-        expect(error).toBeInstanceOf(Error);
+        expect(send).toBeCalledTimes(1);
+        const args = send.mock.calls[0];
+        const result = parseReport(args[0].toString());
+
+        expect(result.key).toEqual('metric.test');
+        expect(result.value).toBeGreaterThanOrEqual(900);
+        expect(result.value).toBeLessThanOrEqual(1100);
+        expect(result.type).toEqual('ms');
+        expect(result.addtionalParts).toEqual('#tag1:value1,tag2:value2');
         done();
       });
     }));
@@ -89,8 +95,8 @@ describe('GraphiteReporter', () => {
         expect(send).toBeCalledTimes(1);
         const args = send.mock.calls[0];
         const data = args[0].toString();
-        const result = splitGraphite(data)[0];
-        expect(result).toEqual(expected);
+        const result = parseReport(data);
+        expect(result.key).toEqual(expected);
         done();
       });
     }));
@@ -109,9 +115,9 @@ describe('GraphiteReporter', () => {
         expect(send).toBeCalledTimes(1);
         const args = send.mock.calls[0];
         const data = args[0].toString();
-        const result = splitGraphite(data)[0];
+        const result = parseReport(data);
 
-        expect(result).toEqual(expected);
+        expect(result.key).toEqual(expected);
         done();
       });
     }));
@@ -128,23 +134,26 @@ describe('GraphiteReporter', () => {
 
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
-      const resultParts = splitGraphite(args[0].toString());
-      expect(resultParts[0]).toEqual('space.subspace');
-      expect(resultParts[1]).toEqual(5);
-      expect(resultParts[2]).toEqual('v');
+      const result = parseReport(args[0].toString());
+      expect(result.key).toEqual('space.subspace');
+      expect(result.value).toEqual(5);
+      expect(result.type).toEqual('v');
     });
 
-    it('when tags are specified, should call the error callback and do not send metric', () => {
+    it('should append tags when tags are available', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4' };
       const reporter = new GraphiteReporter(graphiteOptions);
       let error;
-      const metrics = new Metrics([reporter], e => { error = e; });
+      const metrics = new Metrics([reporter]);
 
-      metrics.space('metric.test', { tag1: 'value1' }).value(5);
+      metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).value(5);
 
       expect(send).not.toBeCalled();
-      expect(error).toBeInstanceOf(Error);
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = parseReport(args[0].toString());
+      expect(result).toEqual('metric.test:5|v|#tag1:value1,tag2:value2');
     });
 
     it('should use the default Graphite port if no port is provided', () => {
@@ -174,8 +183,8 @@ describe('GraphiteReporter', () => {
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
       const data = args[0].toString();
-      const result = splitGraphite(data)[0];
-      expect(result).toEqual(expected);
+      const result = parseReport(data);
+      expect(result.key).toEqual(expected);
     });
 
     it('should add a valid prefix to the Graphite key when one is provided without a trailing dot', () => {
@@ -190,8 +199,8 @@ describe('GraphiteReporter', () => {
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
       const data = args[0].toString();
-      const result = splitGraphite(data)[0];
-      expect(result).toEqual(expected);
+      const result = parseReport(data);
+      expect(result.key).toEqual(expected);
     });
   });
 
@@ -206,23 +215,23 @@ describe('GraphiteReporter', () => {
 
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
-      const resultParts = splitGraphite(args[0].toString());
-      expect(resultParts[0]).toEqual('space.subspace');
-      expect(resultParts[1]).toEqual(10);
-      expect(resultParts[2]).toEqual('c');
+      const result = args[0].toString();
+      expect(result).toEqual('space.subspace:10|c');
     });
 
-    it('when tags are specified, should send error to error callback and do not report metric', () => {
+    it('should append tags to report when tags are available', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4' };
       const reporter = new GraphiteReporter(graphiteOptions);
       let error;
       const metrics = new Metrics([reporter], e => { error = e; });
 
-      metrics.space('metric.test', { tag1: 'value1' }).increment(10);
+      metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).increment(10);
 
-      expect(send).not.toBeCalled();
-      expect(error).toBeInstanceOf(Error);
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('space.subspace:10|c|#tag1:value1,tag2:value2');
     });
 
     it('should use the default Graphite port if no port is provided', () => {
@@ -252,8 +261,8 @@ describe('GraphiteReporter', () => {
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
       const data = args[0].toString();
-      const result = splitGraphite(data)[0];
-      expect(result).toEqual(expected);
+      const result = parseReport(data);
+      expect(result.key).toEqual(expected);
     });
 
     it('should add a valid prefix to the Graphite key when one is provided without a trailing dot', () => {
@@ -268,8 +277,8 @@ describe('GraphiteReporter', () => {
       expect(send).toBeCalledTimes(1);
       const args = send.mock.calls[0];
       const data = args[0].toString();
-      const result = splitGraphite(data)[0];
-      expect(result).toEqual(expected);
+      const result = parseReport(data);
+      expect(result.key).toEqual(expected);
     });
   });
 });
@@ -300,8 +309,14 @@ function setDate(timestamp) {
   dateStub.mockImplementation(() => date);
 }
 
-function splitGraphite(str) {
-  const parts1 = str.split(':', 2);
-  const parts2 = parts1[1].split('|', 2);
-  return [parts1[0], parseInt(parts2[0], 10), parts2[1]];
+function parseReport(str) {
+  const metricKey = str.substr(0, str.indexOf(':'));
+  const metricParts = str.substr(str.indexOf(':') + 1).split('|');
+  const metricValue = parseInt(metricParts[0], 10);
+  return {
+    key: metricKey,
+    value: metricValue,
+    type: metricParts[1],
+    addtionalParts: metricParts.slice(2),
+  };
 }

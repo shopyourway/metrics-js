@@ -2,40 +2,27 @@ const dgram = require('dgram');
 
 const redundantDotsRegex = new RegExp('\\.\\.+', 'g');
 
-module.exports = function GraphiteReporter(opts) {
-  const { host } = opts;
-  const port = opts.port || 8125;
-  const prefix = typeof opts.prefix === 'string' && opts.prefix.length ? removeRedundantDots(`${opts.prefix}.`) : '';
+module.exports = function GraphiteReporter({
+  host,
+  port = 8125,
+  prefix,
+}) {
+  const metricPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
 
-  this.report = (key, value, tags, errorCallback) => {
-    validateTags('REPORT', key, tags);
-
-    const plaintext = `${prefix}${key}:${value}|ms`;
-    send(plaintext, errorCallback);
-  };
-
-  this.value = (key, value, tags, errorCallback) => {
-    validateTags('VALUE', key, tags);
-
-    const plaintext = `${prefix}${key}:${value}|v`;
-    send(plaintext, errorCallback);
-  };
-
-  this.increment = (key, value = 1, tags, errorCallback) => {
-    validateTags('INCREMENT', key, tags);
-
-    const plaintext = `${prefix}${key}:${value}|c`;
-    send(plaintext, errorCallback);
-  };
-
-  function validateTags(op, key, tags) {
-    if (tags) {
-      // eslint-disable-next-line no-console
-      throw new Error(`${op}: Tags are not supported in graphite reporter at this time. "${key}" tags will be emitted`);
-    }
+  function report(key, value, tags, errorCallback) {
+    send(key, value, 'ms', tags, errorCallback);
   }
 
-  function send(stat, errorCallback) {
+  function _value(key, value, tags, errorCallback) {
+    send(key, value, 'v', tags, errorCallback);
+  }
+
+  function increment(key, value = 1, tags, errorCallback) {
+    send(key, value, 'c', tags, errorCallback);
+  }
+
+  function send(key, value, type, tags, errorCallback) {
+    const stat = `${metricPrefix}${key}:${value}|${type}`;
     const socket = dgram.createSocket('udp4');
     const buff = Buffer.from(stat);
 
@@ -47,6 +34,12 @@ module.exports = function GraphiteReporter(opts) {
       }
     });
   }
+
+  return {
+    report,
+    increment,
+    value: _value,
+  };
 };
 
 function removeRedundantDots(str) {
