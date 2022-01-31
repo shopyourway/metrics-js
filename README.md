@@ -156,14 +156,16 @@ Reports metrics to a graphite server (via statsd):
 ```js
 const { Metrics, GraphiteReporter } = require('metrics-reporter');
 
-const graphiteHost = '1.1.1.1'; // Graphite server IP address
-const graphitePort = 8125; // Optional - port number. Defaults to 8125
-const spacePrefix = 'My.Project'; // Optional - prefix to all metrics spaces
+const graphiteHost = '1.1.1.1';         // Graphite server IP address
+const graphitePort = 8125;              // Optional - port number. Defaults to 8125
+const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spaces
+const defaultTags = { tag1: 'value1' }; // Optional - key-value pairs to be appanded to all the metrics reported 
 
 const graphiteReporter = new GraphiteReporter({
 		host: graphiteHost,
 		port: graphitePort,
-		prefix: spacePrefix
+		prefix: spacePrefix,
+		defaultTags,
 	});
 
 const metrics = new Metrics([graphiteReporter], errorCallback);
@@ -174,12 +176,13 @@ Reports metrics to a [DataDog](https://www.datadoghq.com/) (via [DogStatsD](http
 ```js
 const { Metrics, DataDogReporter } = require('metrics-reporter');
 
-const agentHost = '1.1.1.1'; // DataDog agent IP address
-const port = 8125; // Optional - port number. Defaults to 8125
-const spacePrefix = 'My.Project'; // Optional - prefix to all metrics spaces
-const batch = true; // Indicates that metrics will be sent in batches. Default - true
-const maxBufferSize = 500; // Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately. Default - 1000
-const flushInterval = 1000; // Time in milliseconds. Indicates how often the buffer is flushed in case batch = true. Default - 1000 (1s)
+const agentHost = '1.1.1.1';            // DataDog agent IP address
+const port = 8125;                      // Optional - Default `8125` - port number. Defaults to 8125
+const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spaces
+const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
+const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
+const flushInterval = 1000;             // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
+const defaultTags = { tag1: 'value1' }; // Optional - key-value pairs to be appanded to all the metrics reported
 
 const datadogReporter = new DataDogReporter({
     host: agentHost,
@@ -188,6 +191,7 @@ const datadogReporter = new DataDogReporter({
     batch,
     maxBufferSize,
     flushInterval,
+    defaultTags,
 });
 
 const metrics = new Metrics([datadogReporter], errorCallback);
