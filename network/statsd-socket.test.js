@@ -187,6 +187,22 @@ describe('StatsdSocket', () => {
       expect(send).toBeCalledWith({ message: 'space.subspace:1|ms' });
     });
 
+    it('should send metric when value is 0', () => {
+      const { send } = setSocket();
+
+      const target = new StatsdSocket({
+        host: '127.0.0.1',
+      });
+
+      target.send({
+        key: 'space.subspace',
+        value: 0,
+        type: 'ms',
+      });
+
+      expect(send).toBeCalledWith({ message: 'space.subspace:0|ms' });
+    });
+
     it('should send callback when defined', () => {
       const { send } = setSocket();
       const callback = () => {};
