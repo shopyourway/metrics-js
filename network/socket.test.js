@@ -1,6 +1,6 @@
 const dgram = require('dgram');
 const { when } = require('jest-when');
-const Socket = require('./socket');
+const { Socket } = require('./socket');
 
 jest.mock('dgram');
 

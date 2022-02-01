@@ -1,6 +1,6 @@
 const dgram = require('dgram');
 
-module.exports = function Socket({
+function Socket({
   port, host, batch = true, maxBufferSize = 1000, flushInterval = 1000,
 }) {
   if (!port) {
@@ -89,4 +89,8 @@ module.exports = function Socket({
       callback();
     });
   }
+}
+
+module.exports = {
+  Socket,
 };

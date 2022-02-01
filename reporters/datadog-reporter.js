@@ -1,4 +1,4 @@
-const Socket = require('../network/socket');
+const { Socket } = require('../network/socket');
 
 const redundantDotsRegex = new RegExp('\\.\\.+', 'g');
 
