@@ -159,7 +159,7 @@ const { Metrics, GraphiteReporter } = require('metrics-reporter');
 const graphiteHost = '1.1.1.1';         // Graphite server IP address
 const graphitePort = 8125;              // Optional - port number. Defaults to 8125
 const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spaces
-const defaultTags = { tag1: 'value1' }; // Optional - key-value pairs to be appanded to all the metrics reported 
+const tags = { tag1: 'value1' };        // Optional - key-value pairs to be appanded to all the metrics reported 
 
 const graphiteReporter = new GraphiteReporter({
 		host: graphiteHost,
