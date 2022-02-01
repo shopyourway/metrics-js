@@ -9,7 +9,7 @@ const graphiteReporter = new GraphiteReporter({
   host: graphiteHost,
   port: graphitePort,
   prefix: spacePrefix,
-  defaultTags: { defaultTag: 'defaultValue' },
+  tags: { defaultTag: 'defaultValue' },
 });
 
 const metrics = new Metrics([graphiteReporter]);

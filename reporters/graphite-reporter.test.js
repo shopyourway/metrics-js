@@ -65,7 +65,7 @@ describe('GraphiteReporter', () => {
     it('should append default tags to to the metric report', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -89,7 +89,7 @@ describe('GraphiteReporter', () => {
     it('should merge default tags and metric level tags', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -204,7 +204,7 @@ describe('GraphiteReporter', () => {
 
     it('should append default tags when default tags are available', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -218,7 +218,7 @@ describe('GraphiteReporter', () => {
 
     it('should merge default tags and metric level tags', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -311,7 +311,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = {
         host: '1.2.3.4',
-        defaultTags: {
+        tags: {
           tag1: 'value1',
           tag2: 'value2',
         },
@@ -331,7 +331,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = {
         host: '1.2.3.4',
-        defaultTags: {
+        tags: {
           tag1: 'value1',
           tag2: 'value2',
         },

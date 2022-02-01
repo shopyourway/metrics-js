@@ -6,7 +6,7 @@ module.exports = function GraphiteReporter({
   host,
   port = 8125,
   prefix,
-  defaultTags,
+  tags: defaultTags,
 }) {
   const metricPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
 
