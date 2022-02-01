@@ -40,6 +40,22 @@ describe('DataDogReporter', () => {
       });
     }));
 
+    it('should not send data imminently to DataDog if batch is true', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      setDate(1464260419000);
+      const options = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics([reporter]);
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).not.toBeCalled();
+        done();
+      });
+    }));
+
     it('should use the default DataDog port if no port is provided', () => new Promise(done => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
@@ -138,6 +154,17 @@ describe('DataDogReporter', () => {
       expect(result).toEqual('metric.test.value:5|g');
     });
 
+    it('should not send data immediately to DataDog when batch is true', () => {
+      const { send } = stubCreateSocket();
+      const options = { host: '1.2.3.4', batch: true };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('metric.test.value').value(5);
+
+      expect(send).not.toBeCalled();
+    });
+
     it('should use the default DataDog port if no port is provided', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
@@ -211,6 +238,17 @@ describe('DataDogReporter', () => {
       const args = send.mock.calls[0];
       const result = args[0].toString();
       expect(result).toEqual('metric.test.inc:10|c');
+    });
+
+    it('should not send data immediately to DataDog when batch is true', () => {
+      const { send } = stubCreateSocket();
+      const options = { host: '1.2.3.4', batch: true };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('metric.test.inc').increment(10);
+
+      expect(send).not.toBeCalled();
     });
 
     it('should use the default DataDog port if no port is provided', () => {
