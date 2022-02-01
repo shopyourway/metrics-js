@@ -9,7 +9,7 @@
     "datadog",
     "DogStatsD"
   ],
-  "version": "0.8.2",
+  "version": "0.9.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/ysa23/metrics-js"
@@ -20,7 +20,9 @@
     "example:graphite": "node ./examples/graphite.js",
     "example:datadog": "node ./examples/datadog.js",
     "docker:datadog:up": "cd ./docker && docker-compose -f docker-compose-datadog.yml up -d",
-    "docker:datadog:down": "cd ./docker && docker-compose -f docker-compose-datadog.yml down"
+    "docker:datadog:down": "cd ./docker && docker-compose -f docker-compose-datadog.yml down",
+    "docker:graphite:up": "cd ./docker && docker-compose -f docker-compose-graphite.yml up -d",
+    "docker:graphite:down": "cd ./docker && docker-compose -f docker-compose-graphite.yml down"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
