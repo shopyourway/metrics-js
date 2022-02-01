@@ -4,7 +4,7 @@ module.exports = function GraphiteReporter({
   host,
   port = 8125,
   prefix,
-  tags,
+  tags: defaultTags,
   batch = true,
   maxBufferSize = 1000,
   flushInterval = 1000,
@@ -13,11 +13,11 @@ module.exports = function GraphiteReporter({
     port,
     host,
     prefix,
-    tags,
+    tags: defaultTags,
     batch,
     flushInterval,
     maxBufferSize,
-  })
+  });
 
   function report(key, value, tags, errorCallback) {
     socket.send({
@@ -27,13 +27,13 @@ module.exports = function GraphiteReporter({
 
   function _value(key, value, tags, errorCallback) {
     socket.send({
-      key, value, type: 'v', tags, callback: errorCallback
+      key, value, type: 'v', tags, callback: errorCallback,
     });
   }
 
   function increment(key, value = 1, tags, errorCallback) {
     socket.send({
-      key, value, type: 'c', tags, callback: errorCallback
+      key, value, type: 'c', tags, callback: errorCallback,
     });
   }
 
