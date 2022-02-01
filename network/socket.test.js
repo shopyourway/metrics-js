@@ -4,24 +4,90 @@ const { Socket } = require('./socket');
 
 jest.mock('dgram');
 
-describe('socket', () => {
+describe('Socket', () => {
   describe('constructor', () => {
-    it.each([undefined, null])('should throw when port is %s', port => {
-      stubCreateSocket();
+    describe('validations', () => {
+      it.each([
+        ['undefined', undefined],
+        ['null', null],
+        ['string', 'strings'],
+        ['array', ['a', 'b']],
+        ['object', { key: 'value' }],
+        ['function', () => {}]])('should throw when port is %s', (title, port) => {
+        stubCreateSocket();
 
-      expect(() => new Socket({
-        host: '127.0.0.1',
-        port,
-      })).toThrow(TypeError);
-    });
+        expect(() => new Socket({
+          host: '127.0.0.1',
+          port,
+        })).toThrow(TypeError);
+      });
 
-    it.each([undefined, null])('should throw when host is %s', host => {
-      stubCreateSocket();
+      it.each([
+        ['undefined', undefined],
+        ['null', null],
+        ['number', 1],
+        ['array', ['a', 'b']],
+        ['object', { key: 'value' }],
+        ['function', () => {}],
+      ])('should throw when host is %s', (title, host) => {
+        stubCreateSocket();
 
-      expect(() => new Socket({
-        port: 1234,
-        host,
-      })).toThrow(TypeError);
+        expect(() => new Socket({
+          port: 1234,
+          host,
+        })).toThrow(TypeError);
+      });
+
+      it.each([
+        ['null', null],
+        ['number', 1],
+        ['string', 'strings'],
+        ['array', ['a', 'b']],
+        ['object', { key: 'value' }],
+        ['function', () => {}],
+      ])('should throw when batch is %s', (title, batch) => {
+        stubCreateSocket();
+
+        expect(() => new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          batch,
+        })).toThrow(TypeError);
+      });
+
+      it.each([
+        ['null', null],
+        ['boolean', true],
+        ['string', 'strings'],
+        ['array', ['a', 'b']],
+        ['object', { key: 'value' }],
+        ['function', () => {}],
+      ])('should throw when maxBufferSize is %s', (title, maxBufferSize) => {
+        stubCreateSocket();
+
+        expect(() => new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          maxBufferSize,
+        })).toThrow(TypeError);
+      });
+
+      it.each([
+        ['null', null],
+        ['boolean', true],
+        ['string', 'strings'],
+        ['array', ['a', 'b']],
+        ['object', { key: 'value' }],
+        ['function', () => {}],
+      ])('should throw when flushInterval is %s', (title, flushInterval) => {
+        stubCreateSocket();
+
+        expect(() => new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          flushInterval,
+        })).toThrow(TypeError);
+      });
     });
 
     it('should create a socket', () => {

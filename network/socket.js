@@ -3,12 +3,11 @@ const dgram = require('dgram');
 function Socket({
   port, host, batch = true, maxBufferSize = 1000, flushInterval = 1000,
 }) {
-  if (!port) {
-    throw new TypeError('port is mandatory');
-  }
-  if (!host) {
-    throw new TypeError('host is mandatory');
-  }
+  validate({ name: 'port', value: port, type: 'number' });
+  validate({ name: 'host', value: host, type: 'string' });
+  validate({ name: 'batch', value: batch, type: 'boolean' });
+  validate({ name: 'maxBufferSize', value: maxBufferSize, type: 'number' });
+  validate({ name: 'flushInterval', value: flushInterval, type: 'number' });
 
   const socket = dgram.createSocket('udp4');
   socket.unref();
@@ -89,6 +88,12 @@ function Socket({
       callback();
     });
   }
+}
+
+function validate({ name, value, type }) {
+  if (value === undefined || value === null) throw new TypeError(`${name} is missing`);
+  // eslint-disable-next-line valid-typeof
+  if (typeof value !== type) throw new TypeError(`${name} is not a ${type}: ${value}: ${typeof value}`);
 }
 
 module.exports = {
