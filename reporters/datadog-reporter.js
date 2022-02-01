@@ -1,6 +1,4 @@
-const { Socket } = require('../network/socket');
-
-const redundantDotsRegex = new RegExp('\\.\\.+', 'g');
+const { StatsdSocket } = require('../network/statsd-socket');
 
 module.exports = function DataDogReporter({
   host,
@@ -11,47 +9,29 @@ module.exports = function DataDogReporter({
   maxBufferSize = 1000,
   flushInterval = 1000,
 }) {
-  const metricsPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
-  const socket = new Socket({
-    port, host, batch, maxBufferSize, flushInterval,
+  const socket = new StatsdSocket({
+    port, host, batch, maxBufferSize, flushInterval, prefix, tags: defaultTags,
   });
 
   this.report = (key, value, tags, errorCallback) => {
-    send(key, value, 'ms', tags, errorCallback);
+    socket.send({
+      key, value, type: 'ms', tags, callback: errorCallback,
+    });
   };
 
   this.value = (key, value, tags, errorCallback) => {
-    send(key, value, 'g', tags, errorCallback);
+    socket.send({
+      key, value, type: 'g', tags, callback: errorCallback,
+    });
   };
 
   this.increment = (key, value = 1, tags, errorCallback) => {
-    send(key, value, 'c', tags, errorCallback);
+    socket.send({
+      key, value, type: 'c', tags, callback: errorCallback,
+    });
   };
 
   this.close = () => {
     socket.close();
   };
-
-  function send(key, value, type, tags, errorCallback) {
-    const stat = `${metricsPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
-
-    socket.send({ message: stat, callback: errorCallback });
-  }
-
-  function stringifyTags(tags) {
-    if (!tags && !defaultTags) {
-      return '';
-    }
-
-    const allTags = {
-      ...defaultTags,
-      ...tags,
-    };
-
-    return `|#${Object.keys(allTags).map(x => `${x}:${allTags[x]}`).join(',')}`;
-  }
 };
-
-function removeRedundantDots(str) {
-  return str.replace(redundantDotsRegex, '.');
-}
