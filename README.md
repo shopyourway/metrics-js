@@ -165,7 +165,7 @@ const graphiteReporter = new GraphiteReporter({
 		host: graphiteHost,
 		port: graphitePort,
 		prefix: spacePrefix,
-		defaultTags,
+		tags,
 	});
 
 const metrics = new Metrics([graphiteReporter], errorCallback);
