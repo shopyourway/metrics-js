@@ -8,13 +8,7 @@ module.exports = function Space(key, tags, reporters, errback) {
   }
 
   // eslint-disable-next-line no-console
-  const errorCallback = typeof errback === 'function' ? errback : err => {
-    if (!err) {
-      return;
-    }
-
-    console.error(err);
-  };
+  const errorCallback = typeof errback === 'function' ? errback : defaultErrorCallback;
 
   function forEachReporter(func) {
     reporters.forEach(reporter => {
@@ -104,4 +98,12 @@ function isPromise(func) {
 
 function isAsyncFunc(func) {
   return func.constructor.name === 'AsyncFunction';
+}
+
+function defaultErrorCallback(err) {
+  if (!err) {
+    return;
+  }
+
+  console.error(err);
 }
