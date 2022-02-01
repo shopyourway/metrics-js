@@ -34,7 +34,7 @@ function StatsdSocket({
   }
 
   function validate({ name, value, type }) {
-    if (!value) throw new TypeError(`${name} is missing`);
+    if (value === undefined || value === null) throw new TypeError(`${name} is missing`);
     // eslint-disable-next-line valid-typeof
     if (typeof value !== type) throw new TypeError(`${name} is not a ${type}: ${value}: ${typeof value}`);
   }

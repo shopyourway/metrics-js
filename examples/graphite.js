@@ -30,4 +30,6 @@ function timeout(ms) {
     // eslint-disable-next-line no-await-in-loop
     await timeout(10);
   }
+
+  await timeout(10000);
 })();
