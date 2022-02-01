@@ -13,25 +13,32 @@ module.exports = function DataDogReporter({
     port, host, batch, maxBufferSize, flushInterval, prefix, tags: defaultTags,
   });
 
-  this.report = (key, value, tags, errorCallback) => {
+  function report(key, value, tags, errorCallback) {
     socket.send({
       key, value, type: 'ms', tags, callback: errorCallback,
     });
-  };
+  }
 
-  this.value = (key, value, tags, errorCallback) => {
+  function _value(key, value, tags, errorCallback) {
     socket.send({
       key, value, type: 'g', tags, callback: errorCallback,
     });
-  };
+  }
 
-  this.increment = (key, value = 1, tags, errorCallback) => {
+  function increment(key, value = 1, tags, errorCallback) {
     socket.send({
       key, value, type: 'c', tags, callback: errorCallback,
     });
-  };
+  }
 
-  this.close = () => {
+  function close() {
     socket.close();
+  }
+
+  return {
+    report,
+    increment,
+    value: _value,
+    close,
   };
 };
