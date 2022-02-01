@@ -79,7 +79,7 @@ module.exports = function Space(key, tags, reporters, errback) {
   this.space = (nextKey, nextTags) => {
     const newKey = `${key}.${nextKey}`;
     const newTags = { ...tags, ...nextTags };
-    return new Space(newKey, newTags, reporters, errback);
+    return new Space(newKey, newTags, reporters, errorCallback);
   };
 
   function report(reportKey, start, finish) {
