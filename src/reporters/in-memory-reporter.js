@@ -1,4 +1,4 @@
-module.exports = function InMemoryReporter(arr) {
+function InMemoryReporter(arr) {
   const map = new Map();
 
   function report(key, value, tags) {
@@ -23,4 +23,8 @@ module.exports = function InMemoryReporter(arr) {
     value: _value,
     increment,
   };
+}
+
+module.exports = {
+  InMemoryReporter,
 };
