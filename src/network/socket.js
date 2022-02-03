@@ -22,7 +22,7 @@ function Socket({
     interval.unref();
   }
 
-  this.send = ({ message, callback }) => {
+  function send({ message, callback }) {
     if (!message) {
       throw new TypeError('message is mandatory');
     }
@@ -35,14 +35,14 @@ function Socket({
     } else {
       sendImmediate({ message, callback });
     }
-  };
+  }
 
-  this.close = () => {
+  function close() {
     flushBuffer();
     if (interval) {
       clearInterval(interval);
     }
-  };
+  }
 
   function append({ message, callback }) {
     buffer.push({ message, callback });
@@ -88,6 +88,11 @@ function Socket({
       callback();
     });
   }
+
+  return {
+    send,
+    close,
+  };
 }
 
 function validate({ name, value, type }) {
