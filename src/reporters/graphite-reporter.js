@@ -1,6 +1,6 @@
 const { StatsdSocket } = require('../network/statsd-socket');
 
-module.exports = function GraphiteReporter({
+function GraphiteReporter({
   host,
   port = 8125,
   prefix,
@@ -42,4 +42,8 @@ module.exports = function GraphiteReporter({
     increment,
     value: _value,
   };
+}
+
+module.exports = {
+  GraphiteReporter,
 };
