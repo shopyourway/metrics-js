@@ -2,7 +2,7 @@ const dgram = require('dgram');
 
 jest.mock('dgram');
 const { when } = require('jest-when');
-const { Metrics, GraphiteReporter } = require('../index');
+const { Metrics, GraphiteReporter } = require('../../index');
 
 let dateStub;
 

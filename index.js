@@ -1,6 +1,6 @@
-exports.Metrics = require('./metrics');
-exports.StringReporter = require('./reporters/string-reporter');
-exports.ConsoleReporter = require('./reporters/console-reporter');
-exports.GraphiteReporter = require('./reporters/graphite-reporter');
-exports.DataDogReporter = require('./reporters/datadog-reporter');
-exports.InMemoryReporter = require('./reporters/in-memory-reporter');
+exports.Metrics = require('./src/metrics');
+exports.StringReporter = require('./src/reporters/string-reporter');
+exports.ConsoleReporter = require('./src/reporters/console-reporter');
+exports.GraphiteReporter = require('./src/reporters/graphite-reporter');
+exports.DataDogReporter = require('./src/reporters/datadog-reporter');
+exports.InMemoryReporter = require('./src/reporters/in-memory-reporter');
