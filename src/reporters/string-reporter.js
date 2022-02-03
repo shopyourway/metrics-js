@@ -1,4 +1,4 @@
-module.exports = function StringReporter(func) {
+function StringReporter(func) {
   const map = new Map();
 
   function report(key, value, tags) {
@@ -39,4 +39,8 @@ module.exports = function StringReporter(func) {
     value: _value,
     increment,
   };
+}
+
+module.exports = {
+  StringReporter,
 };
