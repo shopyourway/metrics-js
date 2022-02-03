@@ -1,0 +1,9 @@
+.github
+node_modules
+examples
+docker
+yarn.lock
+package-lock.json
+.gitignore
+jest.config.js
+**/*.test.js
