@@ -5,10 +5,14 @@ Metrics is a time series reporting framework for to aggregators and metrics coll
 ![Lint and tests](https://github.com/ysa23/metrics-js/workflows/Lint%20and%20tests/badge.svg)
 ![Node.js Publish to NPM](https://github.com/ysa23/metrics-js/workflows/Node.js%20Publish%20to%20NPM/badge.svg)
 
+## BREAKING CHANGES!
+* InMemoryReporter
+* StringReporter
+* Metrics constructor
 
 ## Highlights
 * Time series reporting
-* Plugin based: Support different aggregators with plugable reporters
+* Plugin based: Support different aggregators with pluggable reporters
 * Built in [reporters](#Reporters):
   * [Graphite (statsd)](#Graphite)
   * [DataDog](#DataDog)
