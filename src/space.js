@@ -19,15 +19,15 @@ module.exports = function Space(key, tags, reporters, errback) {
     });
   }
 
-  this.value = val => {
+  function value(val) {
     forEachReporter(reporter => reporter.value(key, val, tags, errorCallback));
-  };
+  }
 
-  this.increment = (val = 1) => {
+  function increment(val = 1) {
     forEachReporter(reporter => reporter.increment(key, val, tags, errorCallback));
-  };
+  }
 
-  this.meter = func => {
+  function meter(func) {
     if (typeof func !== 'function' && !isPromise(func)) {
       throw new Error('must pass a function as argument');
     }
@@ -73,18 +73,25 @@ module.exports = function Space(key, tags, reporters, errback) {
         return result;
       }
     };
-  };
+  }
 
-  this.space = (nextKey, nextTags) => {
+  function space(nextKey, nextTags) {
     const newKey = `${key}.${nextKey}`;
     const newTags = { ...tags, ...nextTags };
     return new Space(newKey, newTags, reporters, errorCallback);
-  };
+  }
 
   function report(reportKey, start, finish) {
     const duration = finish.getTime() - start.getTime();
     forEachReporter(reporter => reporter.report(reportKey, duration, tags, errorCallback));
   }
+
+  return {
+    value,
+    increment,
+    meter,
+    space,
+  };
 };
 
 function isCallbackFunc(args) {
