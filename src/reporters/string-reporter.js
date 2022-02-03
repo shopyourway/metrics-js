@@ -1,15 +1,15 @@
 module.exports = function StringReporter(func) {
   const map = new Map();
 
-  this.report = (key, value, tags) => {
+  function report(key, value, tags) {
     func(format(key, value, tags));
-  };
+  }
 
-  this.value = (key, value, tags) => {
+  function _value(key, value, tags) {
     func(format(key, value, tags));
-  };
+  }
 
-  this.increment = (key, value = 1, tags) => {
+  function increment(key, value = 1, tags) {
     const k = getKey(key, tags);
 
     let oldValue = map.get(k) || 0;
@@ -18,7 +18,7 @@ module.exports = function StringReporter(func) {
 
     map.set(k, oldValue);
     func(format(key, oldValue, tags));
-  };
+  }
 
   function getKey(key, tags) {
     return `${key}${formatTags(tags)}`;
@@ -33,4 +33,10 @@ module.exports = function StringReporter(func) {
 
     return `{${Object.entries(tags).map(x => `${x[0]}:${x[1]}`).join(',')}}`;
   }
+
+  return {
+    report,
+    value: _value,
+    increment,
+  };
 };
