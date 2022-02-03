@@ -18,7 +18,7 @@ describe('StringReporter', () => {
     it('should call the underlying function of the StringReporter', done => {
       const logFunc = jest.fn();
       const reporter = new StringReporter({ action: logFunc });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -32,7 +32,7 @@ describe('StringReporter', () => {
     it('when tags are specified, tags should be included in the report', done => {
       const logFunc = jest.fn();
       const reporter = new StringReporter({ action: logFunc });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const wrappedFunc = metrics.space('space.meter', { source: 'test' }).meter(func);
 
@@ -48,7 +48,7 @@ describe('StringReporter', () => {
     it('should call the underlying function of the StringReporter', () => {
       const logFunc = jest.fn();
       const reporter = new StringReporter({ action: logFunc });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space.meter').value(10);
 
       expect(logFunc).toBeCalledTimes(1);
@@ -58,7 +58,7 @@ describe('StringReporter', () => {
     it('when space has tags, should add tags to the string argument', () => {
       const logFunc = jest.fn();
       const reporter = new StringReporter({ action: logFunc });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space.meter', { source: 'test', cause: 'error' }).value(10);
 
       expect(logFunc).toBeCalledTimes(1);
@@ -70,7 +70,7 @@ describe('StringReporter', () => {
     it('should call the underlying function of the StringReporter', () => {
       const logFunc = jest.fn();
       const reporter = new StringReporter({ action: logFunc });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space.meter').increment(5);
       metrics.space('space.meter').increment(10);
       metrics.space('space.meter').increment(15);
@@ -84,7 +84,7 @@ describe('StringReporter', () => {
     it('when called with tags, should call the underlying function of the StringReporter with tags', () => {
       const logFunc = jest.fn();
       const reporter = new StringReporter({ action: logFunc });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space.meter', { source: 'test' }).increment(5);
       metrics.space('space.meter', { source: 'test' }).increment(10);
       metrics.space('space.meter', { source: 'test' }).increment(15);
@@ -98,7 +98,7 @@ describe('StringReporter', () => {
     it('when called with different tags, each tag creates a different value', () => {
       const logFunc = jest.fn();
       const reporter = new StringReporter({ action: logFunc });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space.meter', { source: 'test' }).increment(5);
       metrics.space('space.meter', { source: 'src' }).increment(10);
       metrics.space('space.meter', { source: 'test' }).increment(15);

@@ -5,7 +5,7 @@ describe('Space', () => {
     it('should throw an error if not called with a function as argument', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       expect(() => metrics.space('space.meter').meter()).toThrow('must pass a function as argument');
     });
@@ -14,7 +14,7 @@ describe('Space', () => {
       it('should return a Promise', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getPromise(1000);
 
         const result = metrics.space('space.meter').meter(func);
@@ -25,7 +25,7 @@ describe('Space', () => {
       it('upon promise resolve, should create a report where the value is the execution time of the original function it receives as argument', async () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getPromise(1000);
 
         await metrics.space('SYW.Adder').meter(func);
@@ -39,7 +39,7 @@ describe('Space', () => {
       it('upon promise error, should create a report where the value is the execution time of the original function it receives as argument', async () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getPromiseError(1000);
 
         await expect(() => metrics.space('space.meter').meter(func)).rejects.toThrow();
@@ -57,7 +57,7 @@ describe('Space', () => {
       it('should return a async function', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getAsyncFunction(1000);
 
         const result = metrics.space('space.meter').meter(func);
@@ -69,7 +69,7 @@ describe('Space', () => {
       it('upon await successful execution, should create a report where the value is the execution time of the original function it receives as argument', async () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getAsyncFunction(1000);
 
         const wrapper = metrics.space('space.meter').meter(func);
@@ -84,7 +84,7 @@ describe('Space', () => {
       it('upon await error, should create a report where the value is the execution time of the original function it receives as argument', async () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getAsyncErrorFunction(1000);
 
         const wrapper = metrics.space('space.meter').meter(func);
@@ -103,7 +103,7 @@ describe('Space', () => {
       it('should return a function', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getCallbackFunc(1000);
 
         const result = metrics.space('space.meter').meter(func);
@@ -114,7 +114,7 @@ describe('Space', () => {
       it('should create a report where the value is the execution time of the original function it receives as argument', done => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -130,7 +130,7 @@ describe('Space', () => {
       it('should create a report where the key is the argument passed to the Space constructor', done => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -146,7 +146,7 @@ describe('Space', () => {
       it('should call the original function with the same arguments that the wrapped function is called with', done => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = jest.fn(getCallbackFunc(1000));
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -159,7 +159,7 @@ describe('Space', () => {
       it('should call the original callback with the same arguments that the original function would call', done => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('SYW.Adder').meter(func);
 
@@ -172,7 +172,7 @@ describe('Space', () => {
 
       it('should not throw an error when a reporter throws an error', done => {
         const reporter = new FailingReporter();
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -186,7 +186,7 @@ describe('Space', () => {
       it('should call the errback when a reporter throws an error', done => {
         const reporter = new FailingReporter();
         const errback = jest.fn();
-        const metrics = new Metrics([reporter], errback);
+        const metrics = new Metrics({ reporters: [reporter], errback });
         const func = getCallbackFunc(1000);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -204,7 +204,7 @@ describe('Space', () => {
       it('should return a function', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getSyncFunc(500);
 
         const result = metrics.space('space.meter').meter(func);
@@ -215,7 +215,7 @@ describe('Space', () => {
       it('should create a report where the value is the execution time of the original function it receives as argument', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getSyncFunc(500);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -230,7 +230,7 @@ describe('Space', () => {
       it('should create a report where the key is the argument passed to the Space constructor', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getSyncFunc(500);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -244,7 +244,7 @@ describe('Space', () => {
       it('should call the original function with the same arguments that the wrapped function is called with', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = jest.fn(getSyncFunc(500));
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -256,7 +256,7 @@ describe('Space', () => {
       it('should return the result of the original function', () => {
         const reports = [];
         const reporter = new InMemoryReporter({ buffer: reports });
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getSyncFunc(500);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -267,7 +267,7 @@ describe('Space', () => {
 
       it('should not throw an error when a reporter throws an error', () => {
         const reporter = new FailingReporter();
-        const metrics = new Metrics([reporter]);
+        const metrics = new Metrics({ reporters: [reporter] });
         const func = getSyncFunc(500);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -279,7 +279,7 @@ describe('Space', () => {
       it('should call the errback when a reporter throws an error', () => {
         const reporter = new FailingReporter();
         const errback = jest.fn();
-        const metrics = new Metrics([reporter], errback);
+        const metrics = new Metrics({ reporters: [reporter], errback });
         const func = getSyncFunc(500);
         const wrappedFunc = metrics.space('space.meter').meter(func);
 
@@ -297,7 +297,7 @@ describe('Space', () => {
     it('should create a report with the concatenated key', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getSyncFunc(500);
       const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
@@ -311,7 +311,7 @@ describe('Space', () => {
     it('when space has tags, should create a report with all the tags from all spaces', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getSyncFunc(500);
 
       const wrappedFunc = metrics.space('space', { source: 'test' }).space('subspace').space('Foo', { cause: 'error' }).space('Bar')
@@ -332,7 +332,7 @@ describe('Space', () => {
     it('should call the original function with the same arguments that the wrapped function is called with', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = jest.fn(getSyncFunc(500));
       const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
@@ -345,7 +345,7 @@ describe('Space', () => {
     it('should return the result of the original function', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getSyncFunc(500);
       const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
@@ -358,7 +358,7 @@ describe('Space', () => {
     it('should call the errback when a reporter throws an error', () => {
       const reporter = new FailingReporter();
       const errback = jest.fn();
-      const metrics = new Metrics([reporter], errback);
+      const metrics = new Metrics({ reporters: [reporter], errback });
       const func = getSyncFunc(500);
       const wrappedFunc = metrics.space('space').space('subspace').space('Foo').space('Bar')
         .meter(func);
@@ -376,7 +376,7 @@ describe('Space', () => {
     it('when value is not specify, increment by one', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space').space('subspace').space('Foo').space('Bar')
         .increment();
 
@@ -405,7 +405,7 @@ describe('Space', () => {
     it('when value is specified, increment by given value', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space').space('subspace').space('Foo').space('Bar')
         .increment(3);
 
@@ -421,7 +421,7 @@ describe('Space', () => {
     it('when tags are specified, key should have tags', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space', { source: 'test' }).space('subspace').space('Foo', { cause: 'error' }).space('Bar')
         .increment();
 
@@ -439,7 +439,7 @@ describe('Space', () => {
     it('should set value', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space').space('subspace').space('Foo').space('Bar')
         .value(2);
 
@@ -455,7 +455,7 @@ describe('Space', () => {
     it('when tags are specified, should set value', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       metrics.space('space', { source: 'test' }).space('subspace').space('Foo', { cause: 'error' }).space('Bar')
         .value(2);
 

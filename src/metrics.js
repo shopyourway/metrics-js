@@ -1,6 +1,6 @@
 const { Space } = require('./space');
 
-function Metrics(reporters, errback) {
+function Metrics({ reporters, errback }) {
   if (!reporters.every(r => r && typeof r.report === 'function' && typeof r.value === 'function' && typeof r.increment === 'function')) {
     throw new Error('must pass valid reporters with a `report` function');
   }

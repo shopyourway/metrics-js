@@ -7,7 +7,7 @@ describe('Metrics', () => {
       const validReporter = new InMemoryReporter({ buffer: reports });
       const invalidReporter = null;
 
-      expect(() => new Metrics([validReporter, invalidReporter]))
+      expect(() => new Metrics({ reporters: [validReporter, invalidReporter] }))
         .toThrow('must pass valid reporters with a `report` function');
     });
 
@@ -17,7 +17,7 @@ describe('Metrics', () => {
       const invalidReporter = new InMemoryReporter({ buffer: [] });
       delete invalidReporter.report;
 
-      expect(() => new Metrics([validReporter, invalidReporter]))
+      expect(() => new Metrics({ reporters: [validReporter, invalidReporter] }))
         .toThrow('must pass valid reporters with a `report` function');
     });
 
@@ -27,7 +27,7 @@ describe('Metrics', () => {
       const invalidReporter = new InMemoryReporter({ buffer: [] });
       delete invalidReporter.value;
 
-      expect(() => new Metrics([validReporter, invalidReporter]))
+      expect(() => new Metrics({ reporters: [validReporter, invalidReporter] }))
         .toThrow('must pass valid reporters with a `report` function');
     });
 
@@ -37,7 +37,7 @@ describe('Metrics', () => {
       const invalidReporter = new InMemoryReporter({ buffer: [] });
       delete invalidReporter.increment;
 
-      expect(() => new Metrics([validReporter, invalidReporter]))
+      expect(() => new Metrics({ reporters: [validReporter, invalidReporter] }))
         .toThrow('must pass valid reporters with a `report` function');
     });
   });
@@ -46,7 +46,7 @@ describe('Metrics', () => {
     it('should throw an error if not called with a non-empty string as argument', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = () => {};
 
       expect(() => metrics.space(func)).toThrow('must pass non-empty key string as argument');
@@ -55,7 +55,7 @@ describe('Metrics', () => {
     it('when tags is a string, should throw error', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       expect(() => metrics.space('metric.test', 'tag'))
         .toThrow('tags must be an object');
@@ -64,7 +64,7 @@ describe('Metrics', () => {
     it('when tags is an array, should throw error', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       expect(() => metrics.space('metric.test', ['tag']))
         .toThrow('tags must be an object');
@@ -73,7 +73,7 @@ describe('Metrics', () => {
     it('should return a `Space` object', () => {
       const reports = [];
       const reporter = new InMemoryReporter({ buffer: reports });
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       const result = metrics.space('metric.test');
 
