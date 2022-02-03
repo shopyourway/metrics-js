@@ -1,12 +1,14 @@
-function InMemoryReporter(arr) {
+function InMemoryReporter({ buffer }) {
+  if (!buffer && !Array.isArray(buffer)) throw new TypeError('buffer is missing or is not an array');
+
   const map = new Map();
 
   function report(key, value, tags) {
-    arr.push({ key, value, tags });
+    buffer.push({ key, value, tags });
   }
 
   function _value(key, value, tags) {
-    arr.push({ key, value, tags });
+    buffer.push({ key, value, tags });
   }
 
   function increment(key, value = 1, tags) {
@@ -15,7 +17,7 @@ function InMemoryReporter(arr) {
     oldValue += value;
 
     map.set(key, oldValue);
-    arr.push({ key, value: oldValue, tags });
+    buffer.push({ key, value: oldValue, tags });
   }
 
   return {
