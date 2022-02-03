@@ -7,7 +7,6 @@ module.exports = function Space(key, tags, reporters, errback) {
     throw new Error('tags must be an object');
   }
 
-  // eslint-disable-next-line no-console
   const errorCallback = typeof errback === 'function' ? errback : defaultErrorCallback;
 
   function forEachReporter(func) {
