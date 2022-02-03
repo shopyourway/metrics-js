@@ -18,7 +18,7 @@ describe('GraphiteReporter', () => {
     it('should send data to Graphite in the form of "key:value|ms"', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -38,10 +38,26 @@ describe('GraphiteReporter', () => {
       });
     }));
 
+    it('should not send data immediately to Graphite when batch is true', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      setDate(1464260419000);
+      const graphiteOptions = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('space.subspace').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).not.toBeCalled();
+        done();
+      });
+    }));
+
     it('should append tags to to the metric report', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -65,7 +81,7 @@ describe('GraphiteReporter', () => {
     it('should append default tags to to the metric report', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -89,7 +105,7 @@ describe('GraphiteReporter', () => {
     it('should merge default tags and metric level tags', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -112,7 +128,7 @@ describe('GraphiteReporter', () => {
 
     it('should use the default Graphite port if no port is provided', () => new Promise(done => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -131,7 +147,7 @@ describe('GraphiteReporter', () => {
 
     it('should add a valid prefix to the Graphite key when one is provided with a trailing dot', () => new Promise(done => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', prefix: 'namespace.' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace.' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -151,7 +167,7 @@ describe('GraphiteReporter', () => {
 
     it('should add a valid prefix to the Graphite key when one is provided without a trailing dot', () => new Promise(done => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', prefix: 'namespace' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const func = getAsyncFunc(1000);
@@ -174,7 +190,7 @@ describe('GraphiteReporter', () => {
   describe('value', () => {
     it('should send data to Graphite in the form of "key:value|v"', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -188,9 +204,20 @@ describe('GraphiteReporter', () => {
       expect(result.type).toEqual('v');
     });
 
+    it('should not send data immediately to Graphite when batch is true', () => {
+      const { send } = stubCreateSocket();
+      const graphiteOptions = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('space.subspace').value(5);
+
+      expect(send).not.toBeCalled();
+    });
+
     it('should append tags when tags are available', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -204,7 +231,7 @@ describe('GraphiteReporter', () => {
 
     it('should append default tags when default tags are available', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -218,7 +245,7 @@ describe('GraphiteReporter', () => {
 
     it('should merge default tags and metric level tags', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -232,7 +259,7 @@ describe('GraphiteReporter', () => {
 
     it('should use the default Graphite port if no port is provided', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const expected = 8125;
@@ -247,7 +274,7 @@ describe('GraphiteReporter', () => {
 
     it('should add a valid prefix to the Graphite key when one is provided with a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', prefix: 'namespace.' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace.' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const expected = 'namespace.space.subspace';
@@ -263,7 +290,7 @@ describe('GraphiteReporter', () => {
 
     it('should add a valid prefix to the Graphite key when one is provided without a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', prefix: 'namespace' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const expected = 'namespace.space.subspace';
@@ -281,7 +308,7 @@ describe('GraphiteReporter', () => {
   describe('increment', () => {
     it('should send data to Graphite in the form of "key:value|c"', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -293,9 +320,20 @@ describe('GraphiteReporter', () => {
       expect(result).toEqual('space.subspace:10|c');
     });
 
+    it('should not send data immediately to Graphite when batch is true', () => {
+      const { send } = stubCreateSocket();
+      const graphiteOptions = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics([reporter]);
+
+      metrics.space('space.subspace').increment(10);
+
+      expect(send).not.toBeCalled();
+    });
+
     it('should append tags to report when tags are available', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
 
@@ -311,6 +349,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = {
         host: '1.2.3.4',
+        batch: false,
         tags: {
           tag1: 'value1',
           tag2: 'value2',
@@ -331,6 +370,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = {
         host: '1.2.3.4',
+        batch: false,
         tags: {
           tag1: 'value1',
           tag2: 'value2',
@@ -349,7 +389,7 @@ describe('GraphiteReporter', () => {
 
     it('should use the default Graphite port if no port is provided', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const expected = 8125;
@@ -364,7 +404,7 @@ describe('GraphiteReporter', () => {
 
     it('should add a valid prefix to the Graphite key when one is provided with a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', prefix: 'namespace.' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace.' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const expected = 'namespace.space.subspace';
@@ -380,7 +420,7 @@ describe('GraphiteReporter', () => {
 
     it('should add a valid prefix to the Graphite key when one is provided without a trailing dot', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', prefix: 'namespace' };
+      const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace' };
       const reporter = new GraphiteReporter(graphiteOptions);
       const metrics = new Metrics([reporter]);
       const expected = 'namespace.space.subspace';
@@ -408,6 +448,7 @@ function getAsyncFunc(duration) {
 function stubCreateSocket() {
   const socketStub = {
     send: jest.fn(),
+    unref: jest.fn(),
   };
 
   when(dgram.createSocket)

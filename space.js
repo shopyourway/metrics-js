@@ -7,8 +7,7 @@ module.exports = function Space(key, tags, reporters, errback) {
     throw new Error('tags must be an object');
   }
 
-  // eslint-disable-next-line no-console
-  const errorCallback = typeof errback === 'function' ? errback : console.log;
+  const errorCallback = typeof errback === 'function' ? errback : defaultErrorCallback;
 
   function forEachReporter(func) {
     reporters.forEach(reporter => {
@@ -79,7 +78,7 @@ module.exports = function Space(key, tags, reporters, errback) {
   this.space = (nextKey, nextTags) => {
     const newKey = `${key}.${nextKey}`;
     const newTags = { ...tags, ...nextTags };
-    return new Space(newKey, newTags, reporters, errback);
+    return new Space(newKey, newTags, reporters, errorCallback);
   };
 
   function report(reportKey, start, finish) {
@@ -98,4 +97,12 @@ function isPromise(func) {
 
 function isAsyncFunc(func) {
   return func.constructor.name === 'AsyncFunction';
+}
+
+function defaultErrorCallback(err) {
+  if (!err) {
+    return;
+  }
+
+  console.error(err);
 }
