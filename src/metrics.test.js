@@ -40,6 +40,38 @@ describe('Metrics', () => {
       expect(() => new Metrics({ reporters: [validReporter, invalidReporter] }))
         .toThrow('must pass valid reporters with a `report` function');
     });
+
+    it.each([
+      ['undefined', undefined],
+      ['null', null],
+      ['empty array', []],
+      ['number', 1],
+      ['string', 'no strings on me'],
+      ['object', { key: 'value' }],
+    ])('should throw an error when reporters is %s', (title, reporters) => {
+      expect(() => new Metrics({ reporters }))
+        .toThrow('reporters is missing or empty');
+    });
+
+    it.each([
+      ['array', ['a', 'b']],
+      ['number', 1],
+      ['string', 'no strings on me'],
+      ['object', { key: 'value' }],
+    ])('should throw error when errback is %s', (title, errback) => {
+      const reporters = [new InMemoryReporter({ buffer: [] })];
+
+      expect(() => new Metrics({ reporters, errback }))
+        .toThrow('errback must be a function');
+    });
+
+    it('should create a metrics object', () => {
+      const reporters = [new InMemoryReporter({ buffer: [] })];
+      const errback = jest.fn();
+
+      expect(() => new Metrics({ reporters, errback }))
+        .not.toThrow();
+    });
   });
 
   describe('space', () => {
