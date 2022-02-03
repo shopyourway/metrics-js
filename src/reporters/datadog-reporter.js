@@ -1,6 +1,6 @@
 const { StatsdSocket } = require('../network/statsd-socket');
 
-module.exports = function DataDogReporter({
+function DataDogReporter({
   host,
   defaultTags,
   port = 8125,
@@ -41,4 +41,8 @@ module.exports = function DataDogReporter({
     value: _value,
     close,
   };
+}
+
+module.exports = {
+  DataDogReporter,
 };
