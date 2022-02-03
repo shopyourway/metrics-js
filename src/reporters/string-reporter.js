@@ -1,12 +1,14 @@
-function StringReporter(func) {
+function StringReporter({ action }) {
+  if (!action || !(typeof action === 'function')) throw new TypeError('action is missing or not a function');
+
   const map = new Map();
 
   function report(key, value, tags) {
-    func(format(key, value, tags));
+    action(format(key, value, tags));
   }
 
   function _value(key, value, tags) {
-    func(format(key, value, tags));
+    action(format(key, value, tags));
   }
 
   function increment(key, value = 1, tags) {
@@ -17,7 +19,7 @@ function StringReporter(func) {
     oldValue += value;
 
     map.set(k, oldValue);
-    func(format(key, oldValue, tags));
+    action(format(key, oldValue, tags));
   }
 
   function getKey(key, tags) {
