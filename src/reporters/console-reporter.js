@@ -1,6 +1,6 @@
 const StringReporter = require('./string-reporter');
 
-module.exports = function ConsoleReporter() {
+function ConsoleReporter() {
   // eslint-disable-next-line no-console
   const stringReporter = new StringReporter(console.log);
 
@@ -21,4 +21,8 @@ module.exports = function ConsoleReporter() {
     value: _value,
     increment,
   };
+}
+
+module.exports = {
+  ConsoleReporter,
 };
