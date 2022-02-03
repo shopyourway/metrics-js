@@ -5,5 +5,11 @@ module.exports = function Metrics(reporters, errback) {
     throw new Error('must pass valid reporters with a `report` function');
   }
 
-  this.space = (key, tags) => new Space(key, tags, reporters, errback);
+  function space(key, tags) {
+    return new Space(key, tags, reporters, errback);
+  }
+
+  return {
+    space,
+  };
 };
