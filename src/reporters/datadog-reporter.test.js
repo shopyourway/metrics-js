@@ -312,7 +312,7 @@ describe('DataDogReporter', () => {
 
     it('when only default tags are specified, should send data to DataDog in the form of "key:value|c|#tag:value"', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', batch: false, defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const options = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new DataDogReporter(options);
       const metrics = new Metrics({ reporters: [reporter] });
 

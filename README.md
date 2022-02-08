@@ -193,7 +193,7 @@ const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spac
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
 const flushInterval = 1000;             // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
-const defaultTags = { tag1: 'value1' }; // Optional - key-value pairs to be appanded to all the metrics reported
+const tags = { tag1: 'value1' };        // Optional - key-value pairs to be appanded to all the metrics reported
 
 const datadogReporter = new DataDogReporter({
     host: agentHost,
@@ -202,7 +202,7 @@ const datadogReporter = new DataDogReporter({
     batch,
     maxBufferSize,
     flushInterval,
-    defaultTags,
+    tags,
 });
 
 const metrics = new Metrics({ reporters: [datadogReporter] });

@@ -2,7 +2,7 @@ const { StatsdSocket } = require('../network/statsd-socket');
 
 function DataDogReporter({
   host,
-  defaultTags,
+  tags: defaultTags,
   port = 8125,
   prefix,
   batch = true,
