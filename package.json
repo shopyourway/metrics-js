@@ -1,6 +1,7 @@
 {
   "name": "metrics-reporter",
   "description": "Metrics reporting framework for reporting data point information to aggregators (like Graphite)",
+  "main": "./src/index.js",
   "license": "MIT",
   "keywords": [
     "metrics",
@@ -16,7 +17,7 @@
   },
   "scripts": {
     "test": "jest --runInBand --forceExit --detectOpenHandles",
-    "lint": "eslint index.js .",
+    "lint": "eslint src/index.js .",
     "example:graphite": "node ./examples/graphite.js",
     "example:datadog": "node ./examples/datadog.js",
     "docker:datadog:up": "cd ./docker && docker-compose -f docker-compose-datadog.yml up -d",

@@ -1,4 +1,4 @@
-const { Metrics, StringReporter } = require('../../index');
+const { Metrics, StringReporter } = require('../index');
 
 describe('StringReporter', () => {
   describe('constructor', () => {

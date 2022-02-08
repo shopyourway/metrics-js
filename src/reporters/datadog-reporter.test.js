@@ -3,7 +3,7 @@ const dgram = require('dgram');
 jest.mock('dgram');
 
 const { when } = require('jest-when');
-const { Metrics, DataDogReporter } = require('../../index');
+const { Metrics, DataDogReporter } = require('../index');
 
 let dateStub;
 
