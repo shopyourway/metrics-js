@@ -1,4 +1,6 @@
-function Space(key, tags, reporters, errback) {
+function Space({
+  key, tags, reporters, errback,
+}) {
   if (typeof key !== 'string' || key.length === 0) {
     throw new Error('must pass non-empty key string as argument');
   }
@@ -78,7 +80,9 @@ function Space(key, tags, reporters, errback) {
   this.space = (nextKey, nextTags) => {
     const newKey = `${key}.${nextKey}`;
     const newTags = { ...tags, ...nextTags };
-    return new Space(newKey, newTags, reporters, errorCallback);
+    return new Space({
+      key: newKey, tags: newTags, reporters, errback: errorCallback,
+    });
   };
 
   function report(reportKey, start, finish) {

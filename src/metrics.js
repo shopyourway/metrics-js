@@ -9,7 +9,9 @@ function Metrics({ reporters, errback }) {
   }
 
   function space(key, tags) {
-    return new Space(key, tags, reporters, errback);
+    return new Space({
+      key, tags, reporters, errback,
+    });
   }
 
   return {
