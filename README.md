@@ -5,10 +5,9 @@ Metrics is a time series reporting framework for to aggregators and metrics coll
 ![Lint and tests](https://github.com/ysa23/metrics-js/workflows/Lint%20and%20tests/badge.svg)
 ![Node.js Publish to NPM](https://github.com/ysa23/metrics-js/workflows/Node.js%20Publish%20to%20NPM/badge.svg)
 
-
 ## Highlights
 * Time series reporting
-* Plugin based: Support different aggregators with plugable reporters
+* Plugin based: Support different aggregators with pluggable reporters
 * Built in [reporters](#Reporters):
   * [Graphite (statsd)](#Graphite)
   * [DataDog](#DataDog)
@@ -51,12 +50,12 @@ Initialize the metrics instance with the required reporters:
 ```js
 const { StringReporter, ConsoleReporter } = require('metrics-reporter');
 
-const stringReporter = new StringReporter(metricString => {
+const stringReporter = new StringReporter({ action: metricString => {
         // Do something
-    });
+    }});
 const consoleReporter = new ConsoleReporter();
 
-const metrics = new Metrics([stringReporter, consoleReporter], errorCallback);
+const metrics = new Metrics({ reporters: [stringReporter, consoleReporter], errback: errorCallback });
 ```
 
 ### Reporting Metrics
@@ -110,7 +109,7 @@ const result = await metrics.space('users.get').meter(async () => {
     // Some async code here
 })();
 ```
-Please note the invocation on the return value.
+**Please note the invocation on the return value.**
 
 #### Value
 Use the `Metrics` instance to report a value:
@@ -143,9 +142,12 @@ When the same tag is specified when creating nested spaces, the last value will 
 #### Error handling
 Metrics support error handling. When creating a Metric object you can send an error callback:
 ```js
-const metrics = new Metrics([new ConsoleReporter()], e => {
+const metrics = new Metrics({ 
+  reporters: [new ConsoleReporter()],
+  errback: e => {
     // e is a javascript Error object. You can log it on any standard logging framework:
     logger.error(e);
+  }
 });
 ```
 The error callback receives a single parameter - an Error instance. The callback will be triggered when any error occurs during the metrics reporting
@@ -175,7 +177,7 @@ const graphiteReporter = new GraphiteReporter({
     flushInterval,
 	});
 
-const metrics = new Metrics([graphiteReporter], errorCallback);
+const metrics = new Metrics({ reporters: [graphiteReporter] });
 
 graphiteReporter.close(); // close should be called when the application terminates
 ```
@@ -191,7 +193,7 @@ const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spac
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
 const flushInterval = 1000;             // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
-const defaultTags = { tag1: 'value1' }; // Optional - key-value pairs to be appanded to all the metrics reported
+const tags = { tag1: 'value1' };        // Optional - key-value pairs to be appanded to all the metrics reported
 
 const datadogReporter = new DataDogReporter({
     host: agentHost,
@@ -200,10 +202,10 @@ const datadogReporter = new DataDogReporter({
     batch,
     maxBufferSize,
     flushInterval,
-    defaultTags,
+    tags,
 });
 
-const metrics = new Metrics([datadogReporter], errorCallback);
+const metrics = new Metrics({ reporters: [datadogReporter] });
 
 datadogReporter.close(); // close should be called when the application terminates
 ```
@@ -212,24 +214,26 @@ Note that you'll need a running [DataDog agent](https://docs.datadoghq.com/agent
 #### Console
 Console reporter comes in handy when you need to debug metrics calls:
 ```js
-const { Metrics } = require('metrics-reporter');
+const { Metrics, ConsoleReporter } = require('metrics-reporter');
 
-const consoleReporter = new require('metrics-reporter').ConsoleReporter();
+const consoleReporter = new ConsoleReporter();
 	
-const metrics = new Metrics([consoleReporter], errorHandler);
+const metrics = new Metrics({ reporters: [consoleReporter] });
 ```
 When a metrics will be reported, a message will appear in the terminal, that includes the key and the value reported.
 
 #### String
 ```js
-const { Metrics } = require('metrics-reporter');
+const { Metrics, StringReporter } = require('metrics-reporter');
 const fs = require('fs');
 
-const stringReporter = new require('metrics-reporter').StringReporter(metricString => {
-	fs.appendFile('metrics.log', metricsString);
+const stringReporter = new StringReporter({
+    action: metricString => {
+        fs.appendFile('metrics.log', metricsString);
+    },
 });
 	
-const metrics = new Metrics([stringReporter], errorHandler);
+const metrics = new Metrics({ reporters: [stringReporter] });
 ```
 Here, `StringReporter` is used to build a log file from the metrics reports.
 
@@ -240,9 +244,9 @@ const { Metrics, InMemoryReporter } = require('metrics-reporter');
 
 const metricsStorage = [];
 
-const memoryReporter = new InMemoryReporter(metricsStorage);
-	
-const metrics = new Metrics([memoryReporter], error => { /* Do something on error */ });
+const memoryReporter = new InMemoryReporter({ buffer: metricsStorage });
+
+const metrics = new Metrics({ reporters: [memoryReporter], errback: error => { /* Do something on error */ } });
 ```
 When a metric is reported, an object with `key`, `value` and `tags` properties is pushed to the array.<br/>
 Then, the array can be used in order to validate the report.
@@ -266,21 +270,27 @@ For example, lets see how to implement a reporter for redis:
 const client = require('redis').createClient();
 
 module.exports = function RedisReporter(channel) {
-  this.report = function(key, value, tags, errorCallback) { 
-    client.publish(channel, JSON.stringify({ key, value, tags  }));
+  function report(key, val, tags, errorCallback) { 
+    client.publish(channel, JSON.stringify({ key, value: val, tags  }));
   }
 
-  this.value = function(key, value, tags, errorCallback) {
-    client.set(key, value, errorCallback);
+  function value(key, val, tags, errorCallback) {
+    client.set(key, val, errorCallback);
   }
  
-  this.increment = function(key, value, tags, errorCallback) {
+  function increment(key, value, tags, errorCallback) {
     const multi = client.multi();
     for(let i = 0; i < value; i++) {
         multi.incr(key);
     }   
         
     multi.exec(errorCallback);
+  }
+  
+  return {
+    report,
+    value,
+    increment,
   }
 };
 ```

@@ -21,7 +21,7 @@ describe('DataDogReporter', () => {
       setDate(1464260419000);
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
@@ -45,7 +45,7 @@ describe('DataDogReporter', () => {
       setDate(1464260419000);
       const options = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
@@ -60,7 +60,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const expected = 8125;
 
@@ -79,7 +79,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix.', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const expected = 'prefix.metric.test.datadog';
 
@@ -98,7 +98,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const expected = 'prefix.metric.test.datadog';
 
@@ -118,7 +118,7 @@ describe('DataDogReporter', () => {
       setDate(1464260419000);
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test.datadog', { tag1: 'value1', tag2: 'value2' }).meter(func);
@@ -144,7 +144,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test.value').value(5);
 
@@ -158,7 +158,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: true };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test.value').value(5);
 
@@ -169,7 +169,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 8125;
 
       metrics.space('metric.test.value').value(5);
@@ -184,7 +184,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix.', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'prefix.metric.test.value:10|g';
 
       metrics.space('metric.test.value').value(10);
@@ -199,7 +199,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'prefix.metric.test.value:20|g';
 
       metrics.space('metric.test.value').value(20);
@@ -214,7 +214,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test.value', { tag1: 'value1', tag2: 'value2' }).value(5);
 
@@ -230,7 +230,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test.inc').increment(10);
 
@@ -244,7 +244,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: true };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test.inc').increment(10);
 
@@ -255,7 +255,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 8125;
 
       metrics.space('metric.test.inc').increment(5);
@@ -270,7 +270,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix.', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'prefix.metric.test.inc:10|c';
 
       metrics.space('metric.test.inc').increment(10);
@@ -285,7 +285,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', prefix: 'prefix', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'prefix.metric.test.inc:20|c';
 
       metrics.space('metric.test.inc').increment(20);
@@ -300,7 +300,7 @@ describe('DataDogReporter', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test.inc', { tag1: 'value1', tag2: 'value2' }).increment(10);
 
@@ -312,9 +312,9 @@ describe('DataDogReporter', () => {
 
     it('when only default tags are specified, should send data to DataDog in the form of "key:value|c|#tag:value"', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', batch: false, defaultTags: { tag1: 'value1', tag2: 'value2' } };
+      const options = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test.inc').increment(10);
 

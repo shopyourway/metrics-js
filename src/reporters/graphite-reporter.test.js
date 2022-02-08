@@ -20,7 +20,7 @@ describe('GraphiteReporter', () => {
       setDate(1464260419000);
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('space.subspace').meter(func);
@@ -43,7 +43,7 @@ describe('GraphiteReporter', () => {
       setDate(1464260419000);
       const graphiteOptions = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('space.subspace').meter(func);
@@ -59,7 +59,7 @@ describe('GraphiteReporter', () => {
       setDate(1464260419000);
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).meter(func);
@@ -83,7 +83,7 @@ describe('GraphiteReporter', () => {
       setDate(1464260419000);
       const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test').meter(func);
@@ -107,7 +107,7 @@ describe('GraphiteReporter', () => {
       setDate(1464260419000);
       const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).meter(func);
@@ -130,7 +130,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const expected = 8125;
 
@@ -149,7 +149,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace.' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const expected = 'namespace.space.subspace';
 
@@ -169,7 +169,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const func = getAsyncFunc(1000);
       const expected = 'namespace.space.subspace';
 
@@ -192,7 +192,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('space.subspace').value(5);
 
@@ -208,7 +208,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('space.subspace').value(5);
 
@@ -219,7 +219,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).value(5);
 
@@ -233,7 +233,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test').value(5);
 
@@ -247,7 +247,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).value(5);
 
@@ -261,7 +261,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 8125;
 
       metrics.space('space.subspace').value(5);
@@ -276,7 +276,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace.' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'namespace.space.subspace';
 
       metrics.space('space.subspace').value(10);
@@ -292,7 +292,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'namespace.space.subspace';
 
       metrics.space('space.subspace').value(20);
@@ -310,7 +310,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('space.subspace').increment(10);
 
@@ -324,7 +324,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('space.subspace').increment(10);
 
@@ -335,7 +335,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).increment(10);
 
@@ -356,7 +356,7 @@ describe('GraphiteReporter', () => {
         },
       };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test').increment(10);
 
@@ -377,7 +377,7 @@ describe('GraphiteReporter', () => {
         },
       };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
 
       metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).increment(10);
 
@@ -391,7 +391,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 8125;
 
       metrics.space('space.subspace').increment(5);
@@ -406,7 +406,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace.' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'namespace.space.subspace';
 
       metrics.space('space.subspace').increment(10);
@@ -422,7 +422,7 @@ describe('GraphiteReporter', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: false, prefix: 'namespace' };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics([reporter]);
+      const metrics = new Metrics({ reporters: [reporter] });
       const expected = 'namespace.space.subspace';
 
       metrics.space('space.subspace').increment(20);

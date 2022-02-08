@@ -1,18 +1,28 @@
 const StringReporter = require('./string-reporter');
 
-module.exports = function ConsoleReporter() {
+function ConsoleReporter() {
   // eslint-disable-next-line no-console
   const stringReporter = new StringReporter(console.log);
 
-  this.report = (key, value, tags) => {
+  function report(key, value, tags) {
     stringReporter.report(key, value, tags);
-  };
+  }
 
-  this.value = (key, value, tags) => {
+  function _value(key, value, tags) {
     stringReporter.value(key, value, tags);
-  };
+  }
 
-  this.increment = (key, value = 1, tags) => {
+  function increment(key, value = 1, tags) {
     stringReporter.increment(key, value, tags);
+  }
+
+  return {
+    report,
+    value: _value,
+    increment,
   };
+}
+
+module.exports = {
+  ConsoleReporter,
 };
