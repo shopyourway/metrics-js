@@ -1,4 +1,5 @@
 const dgram = require('dgram');
+const { validate } = require('../validation/validator');
 
 function Socket({
   port, host, batch = true, maxBufferSize = 1000, flushInterval = 1000,
@@ -93,12 +94,6 @@ function Socket({
     send,
     close,
   };
-}
-
-function validate({ name, value, type }) {
-  if (value === undefined || value === null) throw new TypeError(`${name} is missing`);
-  // eslint-disable-next-line valid-typeof
-  if (typeof value !== type) throw new TypeError(`${name} is not a ${type}: ${value}: ${typeof value}`);
 }
 
 module.exports = {

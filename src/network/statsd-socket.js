@@ -1,3 +1,4 @@
+const { validate } = require('../validation/validator');
 const { Socket } = require('./socket');
 
 const redundantDotsRegex = new RegExp('\\.\\.+', 'g');
@@ -26,17 +27,13 @@ function StatsdSocket({
     validate({ name: 'value', value, type: 'number' });
     validate({ name: 'type', value: type, type: 'string' });
     if (tags && (Array.isArray(tags) || typeof tags !== 'object')) throw new TypeError('tags should be an object');
-    if (callback && typeof callback !== 'function') throw new TypeError('callback should be a function');
+    validate({
+      name: 'callback', value: callback, type: 'function', required: false,
+    });
 
     const metric = `${metricPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
 
     socket.send({ message: metric, callback });
-  }
-
-  function validate({ name, value, type }) {
-    if (value === undefined || value === null || (typeof value === 'string' && value === '')) throw new TypeError(`${name} is missing`);
-    // eslint-disable-next-line valid-typeof
-    if (typeof value !== type) throw new TypeError(`${name} is not a ${type}: ${value}: ${typeof value}`);
   }
 
   function close() {
