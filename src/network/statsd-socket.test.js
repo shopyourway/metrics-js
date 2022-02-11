@@ -38,6 +38,26 @@ describe('StatsdSocket', () => {
       });
     });
 
+    it('should create socket with given errback', () => {
+      const errback = jest.fn();
+
+      // eslint-disable-next-line no-new
+      new StatsdSocket({
+        host: '127.0.0.1',
+        port: 1234,
+        errback,
+      });
+
+      expect(Socket).toBeCalledWith({
+        host: '127.0.0.1',
+        port: 1234,
+        batch: true,
+        maxBufferSize: 1000,
+        flushInterval: 1000,
+        errback,
+      });
+    });
+
     it.each([
       ['string', 'strings'],
       ['number', 1],
@@ -149,26 +169,6 @@ describe('StatsdSocket', () => {
           tags,
         })).toThrow(TypeError);
       });
-
-      it.each([
-        ['string', 'a string'],
-        ['number', 1],
-        ['array', ['a', 'b']],
-        ['object', { key: 'value' }],
-      ])('should throw when callback is %s', (title, callback) => {
-        setSocket();
-
-        const target = new StatsdSocket({
-          host: '127.0.0.1',
-        });
-
-        expect(() => target.send({
-          key: 'space.the.final.frontier',
-          value: 1.2,
-          type: 'ms',
-          callback,
-        })).toThrow(TypeError);
-      });
     });
 
     it('should send metric', () => {
@@ -201,24 +201,6 @@ describe('StatsdSocket', () => {
       });
 
       expect(send).toBeCalledWith({ message: 'space.subspace:0|ms' });
-    });
-
-    it('should send callback when defined', () => {
-      const { send } = setSocket();
-      const callback = () => {};
-
-      const target = new StatsdSocket({
-        host: '127.0.0.1',
-      });
-
-      target.send({
-        key: 'space.subspace',
-        value: 1,
-        type: 'ms',
-        callback,
-      });
-
-      expect(send).toBeCalledWith({ message: 'space.subspace:1|ms', callback });
     });
 
     it('should append prefix if defined', () => {

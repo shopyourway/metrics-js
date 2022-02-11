@@ -11,29 +11,27 @@ function StatsdSocket({
   flushInterval = 1000,
   tags: defaultTags,
   prefix,
+  errback,
 }) {
   if (defaultTags && (Array.isArray(defaultTags) || typeof defaultTags !== 'object')) throw new TypeError('tags should be an object');
 
   const metricPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
 
   const socket = new Socket({
-    host, port, batch, maxBufferSize, flushInterval,
+    host, port, batch, maxBufferSize, flushInterval, errback,
   });
 
   function send({
-    key, value, type, tags, callback,
+    key, value, type, tags,
   }) {
     validate({ name: 'key', value: key, type: 'string' });
     validate({ name: 'value', value, type: 'number' });
     validate({ name: 'type', value: type, type: 'string' });
     if (tags && (Array.isArray(tags) || typeof tags !== 'object')) throw new TypeError('tags should be an object');
-    validate({
-      name: 'callback', value: callback, type: 'function', required: false,
-    });
 
     const metric = `${metricPrefix}${key}:${value}|${type}${stringifyTags(tags)}`;
 
-    socket.send({ message: metric, callback });
+    socket.send({ message: metric });
   }
 
   function close() {
