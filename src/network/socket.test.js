@@ -88,6 +88,22 @@ describe('Socket', () => {
           flushInterval,
         })).toThrow(TypeError);
       });
+
+      it.each([
+        ['boolean', true],
+        ['number', 1],
+        ['string', 'strings'],
+        ['array', ['a', 'b']],
+        ['object', { key: 'value' }],
+      ])('should throw when errback is %s', (title, errback) => {
+        stubCreateSocket();
+
+        expect(() => new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          errback,
+        })).toThrow(TypeError);
+      });
     });
 
     it('should create a socket', () => {
@@ -141,37 +157,37 @@ describe('Socket', () => {
       expect(send).toBeCalledWith(Buffer.from('a message from beyond'), 0, 21, 1234, '127.0.0.1', expect.any(Function));
     });
 
-    it('should trigger callback when callback is specified', () => {
+    it('should not trigger errback when callback is specified but no error occured', () => {
       stubCreateSocket();
+      const errback = jest.fn();
 
       const target = new Socket({
         port: 1234,
         host: '127.0.0.1',
         batch: false,
+        errback,
       });
 
-      const callback = jest.fn();
+      target.send({ message: 'a message from beyond' });
 
-      target.send({ message: 'a message from beyond', callback });
-
-      expect(callback).toBeCalledTimes(1);
+      expect(errback).not.toBeCalled();
     });
 
     it('should trigger callback with error when error from send occurs', () => {
       const error = new Error();
       stubCreateSocket({ err: error });
+      const errback = jest.fn();
 
       const target = new Socket({
         port: 1234,
         host: '127.0.0.1',
         batch: false,
+        errback,
       });
 
-      const callback = jest.fn();
+      target.send({ message: 'a message from beyond' });
 
-      target.send({ message: 'a message from beyond', callback });
-
-      expect(callback).toBeCalledWith(error);
+      expect(errback).toBeCalledWith(error);
     });
 
     it('should not throw when callback is undefined', () => {
@@ -186,17 +202,6 @@ describe('Socket', () => {
       target.send({ message: 'a message from beyond' });
 
       expect(send).toBeCalledTimes(1);
-    });
-
-    it('should throw when callback is not a function', () => {
-      stubCreateSocket();
-
-      const target = new Socket({
-        port: 1234,
-        host: '127.0.0.1',
-      });
-
-      expect(() => target.send({ message: 'a message from beyond', callback: 'not a function' })).toThrow(TypeError);
     });
 
     describe('buffer', () => {
@@ -272,42 +277,41 @@ describe('Socket', () => {
         expect(send).toBeCalledWith(Buffer.from('a third message\na forth message, too many messages, so little time'), expect.anything(), expect.anything(), expect.anything(), expect.anything(), expect.anything());
       });
 
-      it('should trigger all the callbacks when buffer is flushed', () => {
+      it('should not trigger errback buffer is flushed and no error occured', () => {
         stubCreateSocket();
+        const errback = jest.fn();
 
         const target = new Socket({
           port: 1234,
           host: '127.0.0.1',
           buffer: true,
           maxBufferSize: 30,
+          errback,
         });
 
-        const callback1 = jest.fn();
-        const callback2 = jest.fn();
-
-        target.send({ message: 'a message from beyond', callback: callback1 });
-        target.send({ message: 'another message from beyond', callback: callback2 });
-
-        expect(callback1).toBeCalledTimes(1);
-        expect(callback2).toBeCalledTimes(1);
-      });
-
-      it('should trigger defined callbacks when buffer is flushed', () => {
-        stubCreateSocket();
-
-        const target = new Socket({
-          port: 1234,
-          host: '127.0.0.1',
-          buffer: true,
-          maxBufferSize: 30,
-        });
-
-        const callback = jest.fn();
-
-        target.send({ message: 'a message from beyond', callback });
+        target.send({ message: 'a message from beyond' });
         target.send({ message: 'another message from beyond' });
 
-        expect(callback).toBeCalledTimes(1);
+        expect(errback).not.toBeCalled();
+      });
+
+      it('should trigger errback once when buffer is flushed and an error occurred ', () => {
+        const err = new Error();
+        stubCreateSocket({ err });
+        const errback = jest.fn();
+
+        const target = new Socket({
+          port: 1234,
+          host: '127.0.0.1',
+          buffer: true,
+          maxBufferSize: 30,
+          errback,
+        });
+
+        target.send({ message: 'a message from beyond' });
+        target.send({ message: 'another message from beyond' });
+
+        expect(errback).toBeCalledTimes(1);
       });
 
       it('should send message after interval even if buffer is not full', async () => {
