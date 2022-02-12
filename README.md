@@ -55,7 +55,17 @@ const stringReporter = new StringReporter({ action: metricString => {
     }});
 const consoleReporter = new ConsoleReporter();
 
-const metrics = new Metrics({ reporters: [stringReporter, consoleReporter], errback: errorCallback });
+const reporters = [           // Array of reporters to trigger when a metrics should be reported
+    stringReporter, consoleReporter
+];
+const errback = (err) => {    // Optional - A function to be called when an error occurs           
+  console.error(err);
+};
+
+const metrics = new Metrics({ 
+  reporters: [stringReporter, consoleReporter],
+  errback 
+});
 ```
 
 ### Reporting Metrics
@@ -71,6 +81,7 @@ const metric = metrics.space('http').space('requests'); // http.requests
 #### Execution time
 Use the `meter` method on a `Space` to report execution time of a function:
 ```javascript
+// Callback function
 const wrapper = metrics.space('users.get').meter(function(userIds, callback) {
 	// read users from database
 	callback(...);
@@ -150,7 +161,9 @@ const metrics = new Metrics({
   }
 });
 ```
-The error callback receives a single parameter - an Error instance. The callback will be triggered when any error occurs during the metrics reporting
+The error callback receives a single parameter - an Error instance. The callback will be triggered when any error occurs during the metrics reporting.
+
+**Please note:** Some reporters require their own error handler. Make sure to initialize it as well.  
 
 ### Reporters
 Metrics comes with several built-in reporters
@@ -161,21 +174,25 @@ const { Metrics, GraphiteReporter } = require('metrics-reporter');
 
 const graphiteHost = '1.1.1.1';         // Graphite server IP address
 const graphitePort = 8125;              // Optional - port number. Defaults to 8125
-const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spaces
+const spacePrefix = 'My.Project';        // Optional - prefix to all metrics spaces
 const tags = { tag1: 'value1' };        // Optional - key-value pairs to be appanded to all the metrics reported
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
-const flushInterval = 1000;             // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
+const flushInterval = 1000;              // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
+const errback = (err) => {              // Optional - function to be triggered when an error occurs 
+    console.error(err) 
+};
 
 const graphiteReporter = new GraphiteReporter({
-		host: graphiteHost,
-		port: graphitePort,
-		prefix: spacePrefix,
-		tags,
-    batch,
-    maxBufferSize,
-    flushInterval,
-	});
+  host: graphiteHost,
+  port: graphitePort,
+  prefix: spacePrefix,
+  tags,
+  batch,
+  maxBufferSize,
+  flushInterval,
+errback,
+});
 
 const metrics = new Metrics({ reporters: [graphiteReporter] });
 
@@ -189,20 +206,24 @@ const { Metrics, DataDogReporter } = require('metrics-reporter');
 
 const agentHost = '1.1.1.1';            // DataDog agent IP address
 const port = 8125;                      // Optional - Default `8125` - port number. Defaults to 8125
-const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spaces
+const spacePrefix = 'My.Project';        // Optional - prefix to all metrics spaces
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
-const flushInterval = 1000;             // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
+const flushInterval = 1000;              // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
 const tags = { tag1: 'value1' };        // Optional - key-value pairs to be appanded to all the metrics reported
+const errback = (err) => {              // Optional - function to be triggered when an error occurs 
+  console.error(err)
+};
 
 const datadogReporter = new DataDogReporter({
-    host: agentHost,
-    port,
-    prefix: spacePrefix,
-    batch,
-    maxBufferSize,
-    flushInterval,
-    tags,
+  host: agentHost,
+  port,
+  prefix: spacePrefix,
+  batch,
+  maxBufferSize,
+  flushInterval,
+  tags,
+  errback,
 });
 
 const metrics = new Metrics({ reporters: [datadogReporter] });
@@ -262,29 +283,43 @@ A reporter must contain three methods:
 The methods get the following parameters:
  * `key` (mandatory) - the metric to report
  * `value` (mandatory) - the value to report (ms, count or increment for example)
- * `tags` (optional) - an object that contains the tags to report on the metric as properties 
- * `errorCallback` (optional) - a callback function to be triggered when an error occurs within the reporter.
+ * `tags` (optional) - an object that contains the tags to report on the metric as properties
 
 For example, lets see how to implement a reporter for redis:
 ```js
 const client = require('redis').createClient();
 
-module.exports = function RedisReporter(channel) {
-  function report(key, val, tags, errorCallback) { 
+function RedisReporter({
+    channel, 
+    errback
+}) {
+  function report(key, val, tags) { 
     client.publish(channel, JSON.stringify({ key, value: val, tags  }));
   }
 
-  function value(key, val, tags, errorCallback) {
-    client.set(key, val, errorCallback);
+  function value(key, val, tags) {
+    client.set(key, val, (err) => {
+        if (!err || !errback) {
+            return;
+        }
+        
+        errback(err);
+    });
   }
  
-  function increment(key, value, tags, errorCallback) {
+  function increment(key, value, tags) {
     const multi = client.multi();
     for(let i = 0; i < value; i++) {
         multi.incr(key);
     }   
         
-    multi.exec(errorCallback);
+    multi.exec((err) => {
+      if (!err || !errback) {
+        return;
+      }
+
+      errback(err);
+    });
   }
   
   return {
@@ -292,6 +327,10 @@ module.exports = function RedisReporter(channel) {
     value,
     increment,
   }
+};
+
+module.exports = {
+  RedisReporter,
 };
 ```
 The new reporter will publish a message to a specified channel in redis when a metric is reported.
