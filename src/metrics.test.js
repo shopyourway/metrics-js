@@ -62,7 +62,7 @@ describe('Metrics', () => {
       const reporters = [new InMemoryReporter({ buffer: [] })];
 
       expect(() => new Metrics({ reporters, errback }))
-        .toThrow('errback must be a function');
+        .toThrow(TypeError);
     });
 
     it('should create a metrics object', () => {

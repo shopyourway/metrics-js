@@ -9,24 +9,24 @@ function Space({
     throw new Error('tags must be an object');
   }
 
-  const errorCallback = typeof errback === 'function' ? errback : defaultErrorCallback;
-
   function forEachReporter(func) {
     reporters.forEach(reporter => {
       try {
         func(reporter);
       } catch (e) {
-        errorCallback(e);
+        if (errback) {
+          errback(e);
+        }
       }
     });
   }
 
   this.value = val => {
-    forEachReporter(reporter => reporter.value(key, val, tags, errorCallback));
+    forEachReporter(reporter => reporter.value(key, val, tags));
   };
 
   this.increment = (val = 1) => {
-    forEachReporter(reporter => reporter.increment(key, val, tags, errorCallback));
+    forEachReporter(reporter => reporter.increment(key, val, tags));
   };
 
   this.meter = func => {
@@ -81,13 +81,13 @@ function Space({
     const newKey = `${key}.${nextKey}`;
     const newTags = { ...tags, ...nextTags };
     return new Space({
-      key: newKey, tags: newTags, reporters, errback: errorCallback,
+      key: newKey, tags: newTags, reporters, errback,
     });
   };
 
   function report(reportKey, start, finish) {
     const duration = finish.getTime() - start.getTime();
-    forEachReporter(reporter => reporter.report(reportKey, duration, tags, errorCallback));
+    forEachReporter(reporter => reporter.report(reportKey, duration, tags));
   }
 }
 
@@ -101,14 +101,6 @@ function isPromise(func) {
 
 function isAsyncFunc(func) {
   return func.constructor.name === 'AsyncFunction';
-}
-
-function defaultErrorCallback(err) {
-  if (!err) {
-    return;
-  }
-
-  console.error(err);
 }
 
 module.exports = {
