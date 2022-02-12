@@ -38,6 +38,43 @@ describe('GraphiteReporter', () => {
       });
     }));
 
+    it('should trigger errback when send fails', () => new Promise(done => {
+      const err = new Error();
+      const { send } = stubCreateSocket({ err });
+      setDate(1464260419000);
+      const errback = jest.fn();
+      const graphiteOptions = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({ reporters: [reporter] });
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('space.subspace').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        expect(errback).toBeCalledWith(err);
+        done();
+      });
+    }));
+
+    it('should not trigger errback when send succeeds', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      setDate(1464260419000);
+      const errback = jest.fn();
+      const graphiteOptions = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({ reporters: [reporter] });
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('space.subspace').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        expect(errback).not.toBeCalled();
+        done();
+      });
+    }));
+
     it('should not send data immediately to Graphite when batch is true', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
@@ -204,6 +241,33 @@ describe('GraphiteReporter', () => {
       expect(result.type).toEqual('v');
     });
 
+    it('should trigger errback when send fails', () => {
+      const err = new Error();
+      const { send } = stubCreateSocket({ err });
+      const errback = jest.fn();
+      const graphiteOptions = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('space.subspace').value(5);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).toBeCalledWith(err);
+    });
+
+    it('should not trigger errback when send succeeds', () => {
+      const { send } = stubCreateSocket();
+      const errback = jest.fn();
+      const graphiteOptions = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('space.subspace').value(5);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).not.toBeCalledWith();
+    });
+
     it('should not send data immediately to Graphite when batch is true', () => {
       const { send } = stubCreateSocket();
       const graphiteOptions = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
@@ -318,6 +382,33 @@ describe('GraphiteReporter', () => {
       const args = send.mock.calls[0];
       const result = args[0].toString();
       expect(result).toEqual('space.subspace:10|c');
+    });
+
+    it('should trigger errback when send fails', () => {
+      const err = new Error();
+      const { send } = stubCreateSocket({ err });
+      const errback = jest.fn();
+      const graphiteOptions = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('space.subspace').increment(10);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).toBeCalledWith(err);
+    });
+
+    it('should not trigger errback when send succeeds', () => {
+      const { send } = stubCreateSocket();
+      const errback = jest.fn();
+      const graphiteOptions = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('space.subspace').increment(10);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).not.toBeCalledWith();
     });
 
     it('should not send data immediately to Graphite when batch is true', () => {
@@ -445,9 +536,9 @@ function getAsyncFunc(duration) {
   };
 }
 
-function stubCreateSocket() {
+function stubCreateSocket({ err } = {}) {
   const socketStub = {
-    send: jest.fn(),
+    send: jest.fn((message, offset, length, port, host, callback) => callback && callback(err)),
     unref: jest.fn(),
   };
 
