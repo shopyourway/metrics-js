@@ -63,7 +63,7 @@ const errback = (err) => {    // Optional - A function to be called when an erro
 };
 
 const metrics = new Metrics({ 
-  reporters: [stringReporter, consoleReporter],
+  reporters,
   errback 
 });
 ```
@@ -191,7 +191,7 @@ const graphiteReporter = new GraphiteReporter({
   batch,
   maxBufferSize,
   flushInterval,
-errback,
+  errback,
 });
 
 const metrics = new Metrics({ reporters: [graphiteReporter] });
