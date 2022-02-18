@@ -40,7 +40,46 @@ describe('DataDogReporter', () => {
       });
     }));
 
-    it('should not send data imminently to DataDog if batch is true', () => new Promise(done => {
+    it('should trigger errback when sending fails', () => new Promise(done => {
+      const err = new Error();
+      const { send } = stubCreateSocket({ err });
+      const errback = jest.fn();
+      setDate(1464260419000);
+      const options = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter] });
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        expect(errback).toBeCalledWith(err);
+
+        done();
+      });
+    }));
+
+    it('should not trigger errback when sending succeeds', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      const errback = jest.fn();
+      setDate(1464260419000);
+      const options = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter] });
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        expect(errback).not.toBeCalled();
+
+        done();
+      });
+    }));
+
+    it('should not send data immediately to DataDog if batch is true', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
       const options = { host: '1.2.3.4', batch: true, flushInterval: 10000 };
@@ -154,6 +193,33 @@ describe('DataDogReporter', () => {
       expect(result).toEqual('metric.test.value:5|g');
     });
 
+    it('should trigger errback when send fails', () => {
+      const err = new Error();
+      const { send } = stubCreateSocket({ err });
+      const errback = jest.fn();
+      const options = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('metric.test.value').value(5);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).toBeCalledWith(err);
+    });
+
+    it('should not trigger errback when send succeeds', () => {
+      const { send } = stubCreateSocket();
+      const errback = jest.fn();
+      const options = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('metric.test.value').value(5);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).not.toBeCalled();
+    });
+
     it('should not send data immediately to DataDog when batch is true', () => {
       const { send } = stubCreateSocket();
       const options = { host: '1.2.3.4', batch: true };
@@ -238,6 +304,33 @@ describe('DataDogReporter', () => {
       const args = send.mock.calls[0];
       const result = args[0].toString();
       expect(result).toEqual('metric.test.inc:10|c');
+    });
+
+    it('should trigger errback when send fails', () => {
+      const err = new Error();
+      const { send } = stubCreateSocket({ err });
+      const errback = jest.fn();
+      const options = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('metric.test.inc').increment(10);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).toBeCalledWith(err);
+    });
+
+    it('should not trigger errback when send succeeds', () => {
+      const { send } = stubCreateSocket();
+      const errback = jest.fn();
+      const options = { host: '1.2.3.4', batch: false, errback };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('metric.test.inc').increment(10);
+
+      expect(send).toBeCalledTimes(1);
+      expect(errback).not.toBeCalledWith();
     });
 
     it('should not send data immediately to DataDog when batch is true', () => {
@@ -335,11 +428,12 @@ function getAsyncFunc(duration) {
   };
 }
 
-function stubCreateSocket() {
+function stubCreateSocket({ err } = {}) {
   const socketStub = {
-    send: jest.fn(),
+    send: jest.fn((message, offset, length, port, host, callback) => callback && callback(err)),
     unref: jest.fn(),
   };
+
   when(dgram.createSocket)
     .calledWith('udp4')
     .mockReturnValueOnce(socketStub);

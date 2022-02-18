@@ -8,6 +8,7 @@ function GraphiteReporter({
   batch = true,
   maxBufferSize = 1000,
   flushInterval = 1000,
+  errback,
 }) {
   const socket = new StatsdSocket({
     port,
@@ -17,23 +18,24 @@ function GraphiteReporter({
     batch,
     flushInterval,
     maxBufferSize,
+    errback,
   });
 
-  function report(key, value, tags, errorCallback) {
+  function report(key, value, tags) {
     socket.send({
-      key, value, type: 'ms', tags, callback: errorCallback,
+      key, value, type: 'ms', tags,
     });
   }
 
-  function _value(key, value, tags, errorCallback) {
+  function _value(key, value, tags) {
     socket.send({
-      key, value, type: 'v', tags, callback: errorCallback,
+      key, value, type: 'v', tags,
     });
   }
 
-  function increment(key, value = 1, tags, errorCallback) {
+  function increment(key, value = 1, tags) {
     socket.send({
-      key, value, type: 'c', tags, callback: errorCallback,
+      key, value, type: 'c', tags,
     });
   }
 

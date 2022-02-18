@@ -8,26 +8,27 @@ function DataDogReporter({
   batch = true,
   maxBufferSize = 1000,
   flushInterval = 1000,
+  errback,
 }) {
   const socket = new StatsdSocket({
-    port, host, batch, maxBufferSize, flushInterval, prefix, tags: defaultTags,
+    port, host, batch, maxBufferSize, flushInterval, prefix, tags: defaultTags, errback,
   });
 
-  function report(key, value, tags, errorCallback) {
+  function report(key, value, tags) {
     socket.send({
-      key, value, type: 'ms', tags, callback: errorCallback,
+      key, value, type: 'ms', tags,
     });
   }
 
-  function _value(key, value, tags, errorCallback) {
+  function _value(key, value, tags) {
     socket.send({
-      key, value, type: 'g', tags, callback: errorCallback,
+      key, value, type: 'g', tags,
     });
   }
 
-  function increment(key, value = 1, tags, errorCallback) {
+  function increment(key, value = 1, tags) {
     socket.send({
-      key, value, type: 'c', tags, callback: errorCallback,
+      key, value, type: 'c', tags,
     });
   }
 
