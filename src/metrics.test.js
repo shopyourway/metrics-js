@@ -72,6 +72,26 @@ describe('Metrics', () => {
       expect(() => new Metrics({ reporters, errback }))
         .not.toThrow();
     });
+
+    it.each([
+      ['empty array', []],
+      ['number', 1],
+      ['string', 'no strings on me'],
+    ])('should throw an error when tags is %s', (title, tags) => {
+      const reporters = [new InMemoryReporter({ buffer: [] })];
+
+      expect(() => new Metrics({ reporters, tags }))
+        .toThrow('tags should be an object (key-value)');
+    });
+
+    it('should create a metrics objects with tags', () => {
+      const reporters = [new InMemoryReporter({ buffer: [] })];
+      const tags = { key: 'value' };
+
+      const metrics = new Metrics({ reporters, tags, errback: jest.fn() });
+
+      expect(metrics).toBeDefined();
+    });
   });
 
   describe('space', () => {
@@ -90,7 +110,7 @@ describe('Metrics', () => {
       const metrics = new Metrics({ reporters: [reporter] });
 
       expect(() => metrics.space('metric.test', 'tag'))
-        .toThrow('tags must be an object');
+        .toThrow('tags is not a object: tag: string');
     });
 
     it('when tags is an array, should throw error', () => {
@@ -99,7 +119,7 @@ describe('Metrics', () => {
       const metrics = new Metrics({ reporters: [reporter] });
 
       expect(() => metrics.space('metric.test', ['tag']))
-        .toThrow('tags must be an object');
+        .toThrow('tags is not a object: tag: object');
     });
 
     it('should return a `Space` object', () => {
@@ -110,6 +130,50 @@ describe('Metrics', () => {
       const result = metrics.space('metric.test');
 
       expect(result.constructor.name).toEqual('Space');
+    });
+
+    it('should return `Space` object with default tags', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter({ buffer: reports });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+
+      metrics.space('metric.test').increment();
+
+      expect(reports.length).toEqual(1);
+      expect(reports).toStrictEqual([expect.objectContaining({ tags: { tag1: 'value1', tag2: 'value2' } })]);
+    });
+
+    it('should return `Space` object with tags', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter({ buffer: reports });
+      const metrics = new Metrics({ reporters: [reporter] });
+
+      metrics.space('metric.test', { tag1: 'value1', tag2: 'value2' }).increment();
+
+      expect(reports.length).toEqual(1);
+      expect(reports).toStrictEqual([expect.objectContaining({ tags: { tag1: 'value1', tag2: 'value2' } })]);
+    });
+
+    it('should return `Space` object with tags and default tags', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter({ buffer: reports });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+
+      metrics.space('metric.test', { tag3: 'value3' }).increment();
+
+      expect(reports.length).toEqual(1);
+      expect(reports).toStrictEqual([expect.objectContaining({ tags: { tag1: 'value1', tag2: 'value2', tag3: 'value3' } })]);
+    });
+
+    it('should override default tags with tags', () => {
+      const reports = [];
+      const reporter = new InMemoryReporter({ buffer: reports });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+
+      metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).increment();
+
+      expect(reports.length).toEqual(1);
+      expect(reports).toStrictEqual([expect.objectContaining({ tags: { tag1: 'value1', tag2: 'overridden', tag3: 'value3' } })]);
     });
   });
 });
