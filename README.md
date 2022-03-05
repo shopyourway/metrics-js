@@ -55,15 +55,13 @@ const stringReporter = new StringReporter({ action: metricString => {
     }});
 const consoleReporter = new ConsoleReporter();
 
-const reporters = [           // Array of reporters to trigger when a metrics should be reported
-    stringReporter, consoleReporter
-];
-const errback = (err) => {    // Optional - A function to be called when an error occurs           
-  console.error(err);
-};
+const reporters = [stringReporter, consoleReporter];// Array of reporters to trigger when a metrics should be reported
+const errback = (err) => { console.error(err);};    // Optional - A function to be called when an error occurs
+const tags = { tag1: 'value1' };                    // Optional - key-value pairs to be appanded to all the metrics reported
 
 const metrics = new Metrics({ 
   reporters,
+  tags,
   errback 
 });
 ```
@@ -175,7 +173,6 @@ const { Metrics, GraphiteReporter } = require('metrics-reporter');
 const graphiteHost = '1.1.1.1';         // Graphite server IP address
 const graphitePort = 8125;              // Optional - port number. Defaults to 8125
 const spacePrefix = 'My.Project';        // Optional - prefix to all metrics spaces
-const tags = { tag1: 'value1' };        // Optional - key-value pairs to be appanded to all the metrics reported
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
 const flushInterval = 1000;              // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
@@ -187,7 +184,6 @@ const graphiteReporter = new GraphiteReporter({
   host: graphiteHost,
   port: graphitePort,
   prefix: spacePrefix,
-  tags,
   batch,
   maxBufferSize,
   flushInterval,
@@ -210,7 +206,6 @@ const spacePrefix = 'My.Project';        // Optional - prefix to all metrics spa
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
 const flushInterval = 1000;              // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
-const tags = { tag1: 'value1' };        // Optional - key-value pairs to be appanded to all the metrics reported
 const errback = (err) => {              // Optional - function to be triggered when an error occurs 
   console.error(err)
 };
@@ -222,7 +217,6 @@ const datadogReporter = new DataDogReporter({
   batch,
   maxBufferSize,
   flushInterval,
-  tags,
   errback,
 });
 
