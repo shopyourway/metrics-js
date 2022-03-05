@@ -176,6 +176,56 @@ describe('DataDogReporter', () => {
         done();
       });
     }));
+
+    it('should should send data to DataDog in the form of "key:value|ms|#tag:value" when default tags are specified', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      setDate(1464260419000);
+      const options = { host: '1.2.3.4', batch: false };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test.datadog').meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        const args = send.mock.calls[0];
+
+        const result = splitStat(args[0].toString());
+
+        expect(result[0]).toEqual('metric.test.datadog');
+        expect(result[1]).toBeGreaterThanOrEqual(900);
+        expect(result[1]).toBeLessThanOrEqual(1100);
+        expect(result[2]).toEqual('ms');
+        expect(result[3]).toEqual('#tag1:value1,tag2:value2');
+        done();
+      });
+    }));
+
+    it('should should send data with merged default tags and tags', () => new Promise(done => {
+      const { send } = stubCreateSocket();
+      setDate(1464260419000);
+      const options = { host: '1.2.3.4', batch: false };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+      const func = getAsyncFunc(1000);
+
+      const wrappedFunc = metrics.space('metric.test.datadog', { tag2: 'overridden', tag3: 'value3' }).meter(func);
+
+      wrappedFunc(1, 1, () => {
+        expect(send).toBeCalledTimes(1);
+        const args = send.mock.calls[0];
+
+        const result = splitStat(args[0].toString());
+
+        expect(result[0]).toEqual('metric.test.datadog');
+        expect(result[1]).toBeGreaterThanOrEqual(900);
+        expect(result[1]).toBeLessThanOrEqual(1100);
+        expect(result[2]).toEqual('ms');
+        expect(result[3]).toEqual('#tag1:value1,tag2:overridden,tag3:value3');
+        done();
+      });
+    }));
   });
 
   describe('value', () => {
@@ -288,6 +338,34 @@ describe('DataDogReporter', () => {
       const args = send.mock.calls[0];
       const result = args[0].toString();
       expect(result).toEqual('metric.test.value:5|g|#tag1:value1,tag2:value2');
+    });
+
+    it('should should send data to DataDog in the form of "key:value|g|#tag:value" when default tags are specified, ', () => {
+      const { send } = stubCreateSocket();
+      const options = { host: '1.2.3.4', batch: false };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+
+      metrics.space('metric.test.value').value(5);
+
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('metric.test.value:5|g|#tag1:value1,tag2:value2');
+    });
+
+    it('should should send data with merged tags and default tags', () => {
+      const { send } = stubCreateSocket();
+      const options = { host: '1.2.3.4', batch: false };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+
+      metrics.space('metric.test.value', { tag2: 'overridden', tag3: 'value3' }).value(5);
+
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('metric.test.value:5|g|#tag1:value1,tag2:overridden,tag3:value3');
     });
   });
 
@@ -405,9 +483,9 @@ describe('DataDogReporter', () => {
 
     it('when only default tags are specified, should send data to DataDog in the form of "key:value|c|#tag:value"', () => {
       const { send } = stubCreateSocket();
-      const options = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
+      const options = { host: '1.2.3.4', batch: false };
       const reporter = new DataDogReporter(options);
-      const metrics = new Metrics({ reporters: [reporter] });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
 
       metrics.space('metric.test.inc').increment(10);
 
@@ -415,6 +493,20 @@ describe('DataDogReporter', () => {
       const args = send.mock.calls[0];
       const result = args[0].toString();
       expect(result).toEqual('metric.test.inc:10|c|#tag1:value1,tag2:value2');
+    });
+
+    it('should send data with default tags and tags merged"', () => {
+      const { send } = stubCreateSocket();
+      const options = { host: '1.2.3.4', batch: false };
+      const reporter = new DataDogReporter(options);
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
+
+      metrics.space('metric.test.inc', { tag2: 'overridden', tag3: 'value3' }).increment(10);
+
+      expect(send).toBeCalledTimes(1);
+      const args = send.mock.calls[0];
+      const result = args[0].toString();
+      expect(result).toEqual('metric.test.inc:10|c|#tag1:value1,tag2:overridden,tag3:value3');
     });
   });
 });
