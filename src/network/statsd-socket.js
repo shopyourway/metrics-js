@@ -9,12 +9,9 @@ function StatsdSocket({
   batch = true,
   maxBufferSize = 1000,
   flushInterval = 1000,
-  tags: defaultTags,
   prefix,
   errback,
 }) {
-  if (defaultTags && (Array.isArray(defaultTags) || typeof defaultTags !== 'object')) throw new TypeError('tags should be an object');
-
   const metricPrefix = typeof prefix === 'string' && prefix.length ? removeRedundantDots(`${prefix}.`) : '';
 
   const socket = new Socket({
@@ -39,16 +36,11 @@ function StatsdSocket({
   }
 
   function stringifyTags(tags) {
-    if (!tags && !defaultTags) {
+    if (!tags) {
       return '';
     }
 
-    const allTags = {
-      ...defaultTags,
-      ...tags,
-    };
-
-    return `|#${Object.entries(allTags).map(([key, value]) => `${key}:${value}`).join(',')}`;
+    return `|#${Object.entries(tags).map(([key, value]) => `${key}:${value}`).join(',')}`;
   }
 
   return {

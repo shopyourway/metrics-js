@@ -57,20 +57,6 @@ describe('StatsdSocket', () => {
         errback,
       });
     });
-
-    it.each([
-      ['string', 'strings'],
-      ['number', 1],
-      ['array', ['a', 'b']],
-    ])('should throw when default tags are %s', (title, tags) => {
-      expect(() => {
-        // eslint-disable-next-line no-new
-        new StatsdSocket({
-          host: '127.0.0.1',
-          tags,
-        });
-      }).toThrow(TypeError);
-    });
   });
 
   describe('close', () => {
@@ -276,41 +262,6 @@ describe('StatsdSocket', () => {
       });
 
       expect(send).toBeCalledWith({ message: 'space.subspace:1|ms|#tag1:value1,tag2:value2' });
-    });
-
-    it('should append default tags', () => {
-      const { send } = setSocket();
-
-      const target = new StatsdSocket({
-        host: '127.0.0.1',
-        tags: { tag1: 'value1', tag2: 'value2' },
-      });
-
-      target.send({
-        key: 'space.subspace',
-        value: 1,
-        type: 'ms',
-      });
-
-      expect(send).toBeCalledWith({ message: 'space.subspace:1|ms|#tag1:value1,tag2:value2' });
-    });
-
-    it('should merge tags and default tags', () => {
-      const { send } = setSocket();
-
-      const target = new StatsdSocket({
-        host: '127.0.0.1',
-        tags: { tag1: 'value1', tag2: 'value2' },
-      });
-
-      target.send({
-        key: 'space.subspace',
-        value: 1,
-        type: 'ms',
-        tags: { tag2: 'overridden', tag3: 'value3' },
-      });
-
-      expect(send).toBeCalledWith({ message: 'space.subspace:1|ms|#tag1:value1,tag2:overridden,tag3:value3' });
     });
   });
 

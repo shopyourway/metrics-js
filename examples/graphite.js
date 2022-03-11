@@ -9,10 +9,9 @@ const graphiteReporter = new GraphiteReporter({
   host: graphiteHost,
   port: graphitePort,
   prefix: spacePrefix,
-  tags: { defaultTag: 'defaultValue' },
 });
 
-const metrics = new Metrics([graphiteReporter]);
+const metrics = new Metrics({ reporters: [graphiteReporter], tags: { defaultTag: 'defaultValue' } });
 
 function timeout(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));

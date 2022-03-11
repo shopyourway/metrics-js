@@ -10,7 +10,7 @@ const dataDogReporter = new DataDogReporter({
   prefix: spacePrefix,
 });
 
-const metrics = new Metrics([dataDogReporter]);
+const metrics = new Metrics({ reporters: [dataDogReporter] });
 
 metrics.space('example.metrics.datadog', { tag1: 'value1', env: 'test' }).value(123);
 

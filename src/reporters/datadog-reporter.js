@@ -2,7 +2,6 @@ const { StatsdSocket } = require('../network/statsd-socket');
 
 function DataDogReporter({
   host,
-  tags: defaultTags,
   port = 8125,
   prefix,
   batch = true,
@@ -11,7 +10,7 @@ function DataDogReporter({
   errback,
 }) {
   const socket = new StatsdSocket({
-    port, host, batch, maxBufferSize, flushInterval, prefix, tags: defaultTags, errback,
+    port, host, batch, maxBufferSize, flushInterval, prefix, errback,
   });
 
   function report(key, value, tags) {

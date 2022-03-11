@@ -118,9 +118,9 @@ describe('GraphiteReporter', () => {
     it('should append default tags to to the metric report', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics({ reporters: [reporter] });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test').meter(func);
@@ -142,9 +142,9 @@ describe('GraphiteReporter', () => {
     it('should merge default tags and metric level tags', () => new Promise(done => {
       const { send } = stubCreateSocket();
       setDate(1464260419000);
-      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics({ reporters: [reporter] });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
       const func = getAsyncFunc(1000);
 
       const wrappedFunc = metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).meter(func);
@@ -295,9 +295,9 @@ describe('GraphiteReporter', () => {
 
     it('should append default tags when default tags are available', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics({ reporters: [reporter] });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
 
       metrics.space('metric.test').value(5);
 
@@ -309,9 +309,9 @@ describe('GraphiteReporter', () => {
 
     it('should merge default tags and metric level tags', () => {
       const { send } = stubCreateSocket();
-      const graphiteOptions = { host: '1.2.3.4', batch: false, tags: { tag1: 'value1', tag2: 'value2' } };
+      const graphiteOptions = { host: '1.2.3.4', batch: false };
       const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics({ reporters: [reporter] });
+      const metrics = new Metrics({ reporters: [reporter], tags: { tag1: 'value1', tag2: 'value2' } });
 
       metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).value(5);
 
@@ -441,13 +441,15 @@ describe('GraphiteReporter', () => {
       const graphiteOptions = {
         host: '1.2.3.4',
         batch: false,
+      };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({
+        reporters: [reporter],
         tags: {
           tag1: 'value1',
           tag2: 'value2',
         },
-      };
-      const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics({ reporters: [reporter] });
+      });
 
       metrics.space('metric.test').increment(10);
 
@@ -462,13 +464,15 @@ describe('GraphiteReporter', () => {
       const graphiteOptions = {
         host: '1.2.3.4',
         batch: false,
+      };
+      const reporter = new GraphiteReporter(graphiteOptions);
+      const metrics = new Metrics({
+        reporters: [reporter],
         tags: {
           tag1: 'value1',
           tag2: 'value2',
         },
-      };
-      const reporter = new GraphiteReporter(graphiteOptions);
-      const metrics = new Metrics({ reporters: [reporter] });
+      });
 
       metrics.space('metric.test', { tag2: 'overridden', tag3: 'value3' }).increment(10);
 

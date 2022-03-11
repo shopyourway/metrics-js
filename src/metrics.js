@@ -1,8 +1,10 @@
 const { validate } = require('./validation/validator');
 const { Space } = require('./space');
 
-function Metrics({ reporters, errback }) {
+function Metrics({ reporters, tags: defaultTags, errback }) {
   if (!reporters || !Array.isArray(reporters) || reporters.length === 0) throw new TypeError('reporters is missing or empty');
+  if (defaultTags && (Array.isArray(defaultTags) || typeof defaultTags !== 'object')) throw new TypeError('tags should be an object (key-value)');
+
   validate({
     name: 'errback', value: errback, type: 'function', required: false,
   });
@@ -12,8 +14,21 @@ function Metrics({ reporters, errback }) {
   }
 
   function space(key, tags) {
+    validate({
+      name: 'tags', value: tags, type: 'object', required: false,
+    });
+
+    let allTags;
+
+    if (tags || defaultTags) {
+      allTags = {
+        ...defaultTags,
+        ...tags,
+      };
+    }
+
     return new Space({
-      key, tags, reporters, errback,
+      key, tags: allTags, reporters, errback,
     });
   }
 
