@@ -38,7 +38,7 @@ describe('StringReporter', () => {
 
       wrappedFunc(1, 1, () => {
         expect(logFunc).toBeCalledTimes(1);
-        expect(logFunc).toBeCalledWith(expect.toStartWith('METRICS space.meter{source:test} : 100'));
+        expect(logFunc).toBeCalledWith(expect.toStartWith('METRICS space.meter{source:test} : '));
         done();
       });
     });
