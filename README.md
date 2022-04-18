@@ -161,7 +161,7 @@ const metrics = new Metrics({
 ```
 The error callback receives a single parameter - an Error instance. The callback will be triggered when any error occurs during the metrics reporting.
 
-**Please note:** Some reporters require their own error handler. Make sure to initialize it as well.  
+**Please note:** Some reporters require their own error handler. Make sure to initialize `errback` with them as well.  
 
 ### Reporters
 Metrics comes with several built-in reporters
@@ -172,10 +172,10 @@ const { Metrics, GraphiteReporter } = require('metrics-reporter');
 
 const graphiteHost = '1.1.1.1';         // Graphite server IP address
 const graphitePort = 8125;              // Optional - port number. Defaults to 8125
-const spacePrefix = 'My.Project';        // Optional - prefix to all metrics spaces
+const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spaces
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
-const flushInterval = 1000;              // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
+const flushInterval = 1000;             // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
 const errback = (err) => {              // Optional - function to be triggered when an error occurs 
     console.error(err) 
 };
@@ -202,10 +202,10 @@ const { Metrics, DataDogReporter } = require('metrics-reporter');
 
 const agentHost = '1.1.1.1';            // DataDog agent IP address
 const port = 8125;                      // Optional - Default `8125` - port number. Defaults to 8125
-const spacePrefix = 'My.Project';        // Optional - prefix to all metrics spaces
+const spacePrefix = 'My.Project';       // Optional - prefix to all metrics spaces
 const batch = true;                     // Optional - Default `true` - Indicates that metrics will be sent in batches
 const maxBufferSize = 500;              // Optional - Default `1000` - Size of the buffer for sending batched messages. When buffer is filled it is flushed immediately
-const flushInterval = 1000;              // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
+const flushInterval = 1000;             // Optional - Default `1000` (1s) - Time in milliseconds. Indicates how often the buffer is flushed in case batch = true
 const errback = (err) => {              // Optional - function to be triggered when an error occurs 
   console.error(err)
 };
