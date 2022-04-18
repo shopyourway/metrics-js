@@ -2,8 +2,8 @@
 Metrics is a time series reporting framework for to aggregators and metrics collectors such as [Graphite](https://graphiteapp.org/).
 
 [![npm][npm-image]][npm-url]
-![Lint and tests](https://github.com/ysa23/metrics-js/workflows/Lint%20and%20tests/badge.svg)
-![Node.js Publish to NPM](https://github.com/ysa23/metrics-js/workflows/Node.js%20Publish%20to%20NPM/badge.svg)
+![Lint and tests](https://github.com/ysa23/metrics-reporter/workflows/Lint%20and%20tests/badge.svg)
+![Node.js Publish to NPM](https://github.com/ysa23/metrics-reporter/workflows/Node.js%20Publish%20to%20NPM/badge.svg)
 
 ## Highlights
 * Time series reporting
