@@ -13,7 +13,7 @@
   "version": "0.14.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ysa23/metrics-js"
+    "url": "https://github.com/ysa23/metrics-reporter"
   },
   "scripts": {
     "test": "jest --runInBand --forceExit --detectOpenHandles",
