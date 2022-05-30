@@ -44,13 +44,12 @@ describe('Metrics', () => {
     it.each([
       ['undefined', undefined],
       ['null', null],
-      ['empty array', []],
       ['number', 1],
       ['string', 'no strings on me'],
       ['object', { key: 'value' }],
     ])('should throw an error when reporters is %s', (title, reporters) => {
       expect(() => new Metrics({ reporters }))
-        .toThrow('reporters is missing or empty');
+        .toThrow('reporters is missing');
     });
 
     it.each([
@@ -63,6 +62,14 @@ describe('Metrics', () => {
 
       expect(() => new Metrics({ reporters, errback }))
         .toThrow(TypeError);
+    });
+
+    it('should not throw when reporters is an empty array', () => {
+      const reporters = [];
+      const errback = jest.fn();
+
+      expect(() => new Metrics({ reporters, errback }))
+        .not.toThrow();
     });
 
     it('should create a metrics object', () => {

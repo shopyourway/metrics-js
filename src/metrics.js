@@ -2,7 +2,7 @@ const { validate } = require('./validation/validator');
 const { Space } = require('./space');
 
 function Metrics({ reporters, tags: defaultTags, errback }) {
-  if (!reporters || !Array.isArray(reporters) || reporters.length === 0) throw new TypeError('reporters is missing or empty');
+  if (!reporters || !Array.isArray(reporters)) throw new TypeError('reporters is missing');
   if (defaultTags && (Array.isArray(defaultTags) || typeof defaultTags !== 'object')) throw new TypeError('tags should be an object (key-value)');
 
   validate({
