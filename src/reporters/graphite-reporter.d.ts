@@ -13,6 +13,7 @@ declare interface GraphiteReporterOptions {
 
 export declare class GraphiteReporter implements IReporter {
   constructor(options: GraphiteReporterOptions);
+
   report(key: string, value: number, tags?: Tags);
   value(key: string, value: number, tags?: Tags);
   increment(key: string, value?: number, tags?: Tags);
