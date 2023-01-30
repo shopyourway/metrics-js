@@ -13,8 +13,10 @@ declare interface DataDogReporterOptions {
 
 export declare class DataDogReporter implements IReporter {
   constructor(options: DataDogReporterOptions);
+
   report(key: string, value: number, tags?: Tags);
   value(key: string, value: number, tags?: Tags);
   increment(key: string, value?: number, tags?: Tags);
+
   close();
 }
