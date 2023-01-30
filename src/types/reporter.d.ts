@@ -1,8 +1,6 @@
-import {Tags} from "../types/tags";
-import {IReporter} from "../types/reporter";
+import {Tags} from "./tags";
 
-export declare class ConsoleReporter implements IReporter {
-  constructor();
+export declare interface IReporter {
   report(key: string, value: number, tags?: Tags);
 
   value(key: string, value: number, tags?: Tags);
