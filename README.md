@@ -1,5 +1,5 @@
 # Metrics
-Metrics is a time series reporting framework for to aggregators and metrics collectors such as [Graphite](https://graphiteapp.org/).
+Metrics is a time series reporting framework for aggregators and metrics collectors such as [Graphite](https://graphiteapp.org/).
 
 [![npm][npm-image]][npm-url]
 ![Lint and tests](https://github.com/ysa23/metrics-reporter/workflows/Lint%20and%20tests/badge.svg)
