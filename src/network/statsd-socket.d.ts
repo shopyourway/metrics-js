@@ -1,8 +1,10 @@
+import {Tags} from "../types/tags";
+
 declare interface SendProps {
   key: string;
   value: number;
   type: string;
-  tags?: { [key: string]: string | number | boolean }
+  tags?: Tags;
 }
 
 declare interface StatsdSocketOptions {
