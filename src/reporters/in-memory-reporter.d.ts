@@ -2,7 +2,7 @@ import {IReporter} from "../types/reporter";
 import {Tags} from "../types/tags";
 
 declare interface InMemoryReporterOptions {
-  buffer: [];
+  buffer: any[];
 }
 
 export declare class InMemoryReporter implements IReporter {
