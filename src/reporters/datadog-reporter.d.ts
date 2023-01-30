@@ -16,4 +16,5 @@ export declare class DataDogReporter implements IReporter {
   report(key: string, value: number, tags?: Tags);
   value(key: string, value: number, tags?: Tags);
   increment(key: string, value?: number, tags?: Tags);
+  close();
 }
