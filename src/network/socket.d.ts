@@ -1,9 +1,11 @@
+import {ErrorCallback} from "../types/error-callback";
+
 declare interface SocketOptions {
   port: number;
   host: string;
   maxBufferSize?: number;
   flushInterval?: number;
-  errback?: (err: Error) => void;
+  errback?: ErrorCallback;
 }
 
 declare interface SendProps {

@@ -1,4 +1,5 @@
 import {Tags} from "../types/tags";
+import {ErrorCallback} from "../types/error-callback";
 
 declare interface SendProps {
   key: string;
@@ -14,7 +15,7 @@ declare interface StatsdSocketOptions {
   maxBufferSize?: number;
   flushInterval?: number;
   prefix?: string;
-  errback?: (err: Error) => void;
+  errback?: ErrorCallback;
 }
 
 export declare class StatsdSocket {
