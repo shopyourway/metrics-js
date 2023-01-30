@@ -10,7 +10,7 @@ declare interface SendProps {
   message: any;
 }
 
-declare class Socket {
+export declare class Socket {
   constructor(options: SocketOptions);
 
   send(props: SendProps) : void;
