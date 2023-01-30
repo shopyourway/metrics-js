@@ -7,6 +7,7 @@ declare interface StringReporterOptions {
 
 export declare class StringReporter implements IReporter {
   constructor(options: StringReporterOptions);
+
   increment(key: string, value?: number, tags?: Tags);
   report(key: string, value: number, tags?: Tags);
   value(key: string, value: number, tags?: Tags);
