@@ -18,8 +18,8 @@
   "scripts": {
     "test": "jest --runInBand --forceExit --detectOpenHandles",
     "lint": "eslint src/index.js .",
-    "build-declarations": "tsc",
-    "watch-declarations": "tsc -w",
+    "tsc:build": "tsc",
+    "tsc:watch": "tsc -w",
     "example:graphite": "node ./examples/graphite.js",
     "example:datadog": "node ./examples/datadog.js",
     "docker:datadog:up": "cd ./docker && docker-compose -f docker-compose-datadog.yml up -d",

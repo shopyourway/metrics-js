@@ -13,4 +13,4 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm test
-      - run: npm run build-declarations
+      - run: npm run tsc:build
