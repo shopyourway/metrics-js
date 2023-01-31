@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2021",
+  },
+  "include": [
+    "./src/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+  ]
+}
